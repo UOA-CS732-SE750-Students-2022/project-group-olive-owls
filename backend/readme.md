@@ -1,25 +1,30 @@
-Install Notes:
-- These are some base setup notes. Not all may be required. 
-** Depends on your global installs
-=================================================================
+# =================================================================
+# Install Notes:
+# =================================================================
+- These are some base setup notes. Not all may be required. ** Depends on your global installs
+# =================================================================
 **npm install --save express
 **yarn add react-router-dom
 
-- These modules need to be installed
+# Required modules, need to be installed
 yarn add esm
 yarn add axios
 
+# MongoDB library
 yarn add mongodb
-# or ...
+or ...
 npm install mongodb
 
-- Good for server testing. Daemon does not fork to background
+# Nodaemon. Good for server testing. Daemon does not fork to background and automatically restarts on save
 yarn global add nodemon 
-# or ...
+or ...
 npm install -g nodemon
 
 
-=================================================================
+
+# =================================================================
+#  Notes:
+# =================================================================
 
 9/4/2022 10:26am
 Initial setup of backend directory on github:project-group-olive-owl
@@ -32,8 +37,8 @@ Initial setup of backend directory on github:project-group-olive-owl
 - Installed libraries
 	- esm
 	- axios
-	-
 - Initial code cleanup
 - Ran devstart test environment before commit
-=================================================================
+
+# =================================================================
 
