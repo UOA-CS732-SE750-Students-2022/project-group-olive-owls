@@ -9,29 +9,35 @@ import {
   } from "react-router-dom";
 
 import Container from '@mui/material/Container';
+import Menubar from "./Menubar";
 export default function SignIn() {
 
 
     return (
         <div>
-        <Container component="main" maxWidth="xs">
-        <Box sx={{
-            marginTop: 70,
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-        <Link to='/login'>
-        <Button fullWidth variant="contained"  sx={{
-            marginRight: 10,
-          }}>Login</Button></Link>
-        <Link to='/register'>
-        <Button fullWidth variant="contained" sx={{
-            marginLeft: 10,
-          }}>Register</Button></Link>
-
-        </Box>
-        </Container>
+            <Container component="main" maxWidth="xs">
+                <Box sx={{
+                    marginTop: 70,
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                    <Link to='/login'>
+                        <Button fullWidth variant="contained"  sx={{
+                            marginRight: 10,
+                          }}>
+                            Login
+                        </Button>
+                    </Link>
+                    <Link to='/register'>
+                        <Button fullWidth variant="contained" sx={{
+                            marginLeft: 10,
+                          }}>
+                            Register
+                        </Button>
+                    </Link>
+                </Box>
+            </Container>
         </div>
     )
 }
