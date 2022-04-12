@@ -9,19 +9,19 @@ Not all may be required.
 **yarn add react-router-dom
 
 - Required modules, need to be installed
-yarn add esm
-yarn add axios
+"yarn add esm"
+"yarn add axios"
 
 - MongoDB library
-yarn add mongodb
+"yarn add mongodb"
 or ...
-npm install mongodb
+"npm install mongodb"
 
 - Nodaemon. Good for server testing. 
   Daemon does not fork to background and automatically restarts on save
-yarn global add nodemon 
+"yarn global add nodemon"
 or ...
-npm install -g nodemon
+"npm install -g nodemon"
 
 
 #  Notes:

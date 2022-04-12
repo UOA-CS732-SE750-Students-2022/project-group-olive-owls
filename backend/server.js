@@ -189,6 +189,110 @@ app.get('/queryname', (req, res) => {
 
 });
 
+// "mongoupdateone" endpoint. 
+// Query to update a single keyed record
+app.get('/mongoupdateone', (req, res) => {
+    console.log("Inside /mongoupdateone");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        var query = { id: 5 };
+        var newvalues = { $set: {last_name: "Mickey" } };
+        
+        dbo.collection("Users").updateOne(query, newvalues, function(err, result) {
+            if (err) throw err;
+            console.log("err:");
+            console.log(err);
+            console.log("Monogo data: Document updated");
+            console.log(result);
+            recData = result;
+            db.close();
+            res.status(200).send(recData);
+            //return recData;            
+        });
+
+    });
+
+    console.log("Call return") ;
+    console.log(recData);
+    //res.status(200).contentType('text/html').send(output);
+});
+
+
+// "mongoinsertone" endpoint. 
+// Query to insert a single record
+app.get('/mongoinsertone', (req, res) => {
+    console.log("Inside /mongoinsertone");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        //var query = { id: 3 };
+        var newvalues = { id: 5, first_name: "Company Inc", last_name: "Company Inc", email: "test@test.com" };
+        
+        dbo.collection("Users").insertOne(newvalues, function(err, result) {
+            if (err) throw err;
+            console.log("err:");
+            console.log(err);
+            console.log("Monogo data: Document updated");
+            console.log(result);
+            recData = result;
+            db.close();
+            res.status(200).send(recData);
+            //return recData;            
+        });
+
+    });
+    console.log("Call return") ;
+    console.log(recData);
+    //res.status(200).contentType('text/html').send(output);
+});
+
+
+// "mongodeleteone" endpoint. 
+// Query to delete a single record
+app.get('/mongodeleteone', (req, res) => {
+    console.log("Inside /mongodeleteone");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        var query = { id: 5 };
+        //var newvalues = { id: 5 };
+        
+        dbo.collection("Users").deleteOne(query, function(err, result) {
+            if (err) throw err;
+            console.log("err:");
+            console.log(err);
+            console.log("Monogo data: Record deleted");
+            console.log(result);
+            recData = result;
+            db.close();
+            res.status(200).send(recData);
+            //return recData;            
+        });
+
+    });
+    console.log("Call return") ;
+    console.log(recData);
+    //res.status(200).contentType('text/html').send(output);
+});
+
+
+
 // ==========================
 //  End of Endpoints
 // ==========================
