@@ -15,6 +15,8 @@ import {
     Route,
     Link
 } from "react-router-dom";
+import {DragAndDrop} from "./component/DragAndDrop";
+
 function App() {
     return (
         <div className="App">
@@ -29,6 +31,8 @@ function App() {
                         <Route path="/register" element={<Register />}>
 
                         </Route>
+                        <Route path="/dnd" element={<DragAndDrop />}/>
+
                     </Routes>
 
                 </Router>
