@@ -3,12 +3,14 @@ import './App.css';
 
 import SignIn from './component/signIn';
 import Register from './component/register';
+
 import Alert from './component/Alert';
 import Root from './component/root';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import Menubar from "./component/Menubar";
-import {Button} from '@mui/material'
+import {Button} from '@mui/material';
+
 
 import {
     BrowserRouter as Router,
@@ -17,6 +19,7 @@ import {
     Link
 } from "react-router-dom";
 import {DragAndDrop} from "./component/DragAndDrop";
+import SideBar from "./component/Sidebar";
 
 function App() {
     return (
@@ -32,6 +35,7 @@ function App() {
                         <Route path="/register" element={<Register />}>
 
                         </Route>
+                        <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
 
