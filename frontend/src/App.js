@@ -3,6 +3,8 @@ import './App.css';
 
 import SignIn from './component/signIn';
 import Register from './component/register';
+
+import Alert from './component/Alert';
 import Root from './component/root';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -34,6 +36,8 @@ function App() {
 
                         </Route>
                         <Route path="/sidebar" element={<SideBar />}/>
+                        <Route path="/dnd" element={<DragAndDrop />}/>
+                        <Route path="/alert" element={<Alert open={true} />}/>
 
                     </Routes>
 
