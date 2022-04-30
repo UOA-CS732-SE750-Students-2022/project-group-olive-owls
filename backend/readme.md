@@ -40,5 +40,14 @@ Initial setup of backend directory on github:project-group-olive-owl
 - Initial code cleanup
 - Ran devstart test environment before commit
 
-#
+#       Modification history
+
+26/4/2022					S. Schmidt
+Desc: 
+ Made changes to server.js to include handling encrypted connections as well as some basic authentication. 
+Had to move server.js to server.cjs extention to handle the "require" function correctly for https libraries.
+** Still a bit more to add here **
+
+29/04/2022					S. Schmidt
+Desc: Added endpoints for CRUD functions on the Events table.
 
