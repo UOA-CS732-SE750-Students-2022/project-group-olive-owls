@@ -51,3 +51,16 @@ Had to move server.js to server.cjs extention to handle the "require" function c
 29/04/2022					S. Schmidt
 Desc: Added endpoints for CRUD functions on the Events table.
 
+Date: 3/5/2022                             S. Schmidt
+Desc: 
+    - Added 3 control switchs
+      # "disableHTTPS" which allows HTTPS to be switched on or off in code.
+        (Primarily for use when runningoff localhost or just dont want encryption.)
+      # "disableBEARER" which allows bearer authentication to be switched on or off in code.
+        (A second form of authenticaiton is used in the code for the Events processing. This was before the Token auth was setup.)
+      # "admin" which allows admin endpoints switched on or off in code. (useful for debugging)
+        (Just makes life a bit easier when you can auth the Token auth table.)
+    - Added endpoints for User access control. 
+      # User Token Authentication processing
+      # CRUD funtions against user authentication table entries
+      # STILL TODO: Authenticaton logging

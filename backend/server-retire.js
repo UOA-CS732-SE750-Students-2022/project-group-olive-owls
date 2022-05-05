@@ -67,8 +67,9 @@ function mongodbTest() {
 // Main code
 //------------------------------------------------------
 
-const date = Date.now();
 console.info("Inside server.js   Start: "+date.getTime);
+const date = Date.now();
+
 
 // Setup Express
 const app = express();

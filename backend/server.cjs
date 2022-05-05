@@ -4,6 +4,10 @@
 //      It will handle all backend processing requests for the COVID app
 //   which is being designed for the group project submission for CS732/SE750.
 //
+// ##################################
+//   Modification History
+// ##################################
+//
 //   Date: 20/4/2022                            S. Schmidt
 //   Desc: Made changes to include handling encrypted connections as well as some basic authentication.
 // 	Move server.js to server.cjs (common JS format) to handle the "require" function correctly for MongoDB client libraries.
@@ -11,29 +15,112 @@
 //   Date: 20/4/2022                            S. Schmidt
 //   Desc: Added endpoints for CRUD operations on the Events table.
 //
+//   Date: 3/5/2022                             S. Schmidt
+//   Desc: 
+//      - Added 3 control switchs
+//          # "disableHTTPS" which allows HTTPS to be switched on or off in code.
+//          # "disableBEARER" which allows bearer authentication to be switched on or off in code.
+//          # "admin" which allows admin endpoints switched on or off in code. (useful for debugging)
+//      - Added endpoints for User access control. 
+//          # User Token Authentication processing
+//          # CRUD funtions against user authentication table entries
+//          # STILL TODO: Authenticaton logging
+//
+
+function generateRandom (len) {
+    var crypto = require("crypto");
+    return crypto.randomBytes(len).toString('hex');
+}
+
+// Expire tokens.
+  function expiretokens () {
+    console.log("Inside expiretokens funciton");
+    arraysize = Object.keys(masterTokenTable).length
+    allexpired = true;                  // Default to true. If there are active tokens this will be set to true in the loop
+    if (arraysize > 0) {
+        const dd = {};
+        //console.log(masterTokenTable);
+        var iterationCounter =1;
+        for (var token in masterTokenTable) {
+            dd[token] = masterTokenTable[token];
+            console.log(dd[token].tokenElement.tokenkey);
+            console.log(dd[token].tokenElement.expires);
+            console.log(dd[token].tokenElement.expired);
+            currenttimestamp = Math.floor(Date.now() / 1000);
+            expiretimestamp = dd[token].tokenElement.expires;
+            if ((currenttimestamp > expiretimestamp) && (!dd[token].tokenElement.expired)) {                   // Timestamp has expired. Mark token as expired.
+                dd[token].tokenElement.expired = true;
+                masterTokenTable[token].tokenElement.tokenkey = true;
+                console.log(masterTokenTable[token].tokenElement.tokenkey+" has expired.") ;
+            }
+            if (!dd[token].tokenElement.expired) {   // We still have active tokens. don't clear object
+                allexpired = false;
+            }
+            iterationCounter = iterationCounter + 1;
+        }
+        if (allexpired) {                 // All tokens have expired. clear tracking object
+            masterTokenTable = [];
+        }
+    }
+}  
+
+// Expire tokens.
+function searchtokens (searchstring) {
+    console.log("Inside searchtokens function");
+    arraysize = Object.keys(masterTokenTable).length
+    allexpired = true;                  // Default to true. If there are active tokens this will be set to true in the loop
+    if (arraysize > 0) {
+        const dd = {};
+        //console.log(masterTokenTable);
+        var iterationCounter =1;
+        for (var token in masterTokenTable) {
+            dd[token] = masterTokenTable[token];
+            if (!dd[token].tokenElement.expired) {
+                if (dd[token].tokenElement.tokenkey === searchstring) {
+                    console.log("String found");
+                    return dd[token];
+                }
+            }
+            iterationCounter = iterationCounter + 1;
+        }
+        return false;
+    }
+}  
 
 
 const express = require('express');
 const https = require('https');
+const http  = require('http');
 const fs = require('fs');
-const port = 8010;
 
 const axios = require('axios');
 const path = require('path');
+const { Console } = require("console");
+const { exit } = require("process");
 
 const axiosKey = "d802faa0-10bd-11ec-b2fe-47a0872c6708";
 const authKey = "Bearer 1234567890";
+masterTokenTable = [];
 
 const fullDate = new Date();
 const date = Date.now();
 
+// Control switches
+const disableHTTPS = true;      // Disable HTTPS for dev mode. Change to true for prod mode
+const disableBearer = true;     // Disable Bearer Auth for dev mode. Change to true for prod mode
+const admin = true;             // Admin processing functions available like dumpmastertokens endpoint for debugging
+const port = 8010;              // Port number to open server on 
+
 console.info("Inside server.js   Start: "+date.getTime);
 
-var key = fs.readFileSync(__dirname + '/certs/privkey.pem');
-var cert = fs.readFileSync(__dirname + '/certs/fullchain.pem');
-var options = {
-  key: key,
-  cert: cert
+// Load HTTPS cert
+if (!disableHTTPS) {
+    var key = fs.readFileSync(__dirname + '/certs/privkey.pem');
+    var cert = fs.readFileSync(__dirname + '/certs/fullchain.pem');
+    var options = {
+        key: key,
+        cert: cert
+    }
 };
 
 app = express()
@@ -105,14 +192,6 @@ app.get('/queryname', (req, res) => {
         });
 
     });
-    //res.json({
-    //    Endpoint: '/api',
-    //    name: req.query.name,
-    //    ip: ip
-    //});
-
-    //res.json({ recData });
-
 });
 
 
@@ -196,10 +275,11 @@ app.get('/getevent', (req, res) => {
             db.close();
             //console.log("Final Return");
             //console.log(recData);
-	    //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-	    res.setHeader('Access-Control-Allow-Methods', '*');
+	        //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	        res.setHeader('Access-Control-Allow-Methods', '*');
             res.status(200).send(recData);
-	    console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip);
+            const fullDate = new Date();
+	        console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip);
         });
     });
 });
@@ -217,9 +297,6 @@ app.all('/addevent', (req, res) => {
         console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
         return;
     }
-    //console.log(authHeader);
-    //var eventid = req.query.eventid;
-    //console.log("Received EventID: "+eventid);
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -229,74 +306,42 @@ app.all('/addevent', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-	var Events = dbo.collection("Users");
+	    var Events = dbo.collection("Users");
 
-        //var query = { id: 3 };
     	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
-	//var newEvent = '{ eventName: "Company Lunch", Description: "Company Lonchon sometime", Location: "Invercargill", datetime: "'+currentDate+'" }';
-	//var newEventString = JSON.stringify(newEvent);
-	//var newvalues = JSON.parse(newEvent);
-	//var newvalues = newEvent;
 
-	// DB Processing
-        // Start by getting the next eventID
-	//console.log("Getting Count");
 	dbo.collection("Events").find({}).sort({"eventID" : -1}).limit(1).toArray(function(err, result1) {
-            	if (err) throw err;
-        	//console.log("Monogo data: Returned for find RESULT1");
-        	//console.log(result1[0]);
+        if (err) throw err;
 		const nextID = result1[0].eventID + 1;
-		//console.log(result1[0].eventID);
-		//console.log(result1[0].eventName);
-        	//console.log(ev);
 
- 		//var iterationCounter =1;
- 		//for (var propertyKey in result1[0]) {
-    		//	console.log("Running iteration " + iterationCounter +
-                //    	"\n\t propertyKey variable is: " + propertyKey +
-                //    	"\n\t the associated value is: " + result1[propertyKey[0]] );
-    		//	iterationCounter = iterationCounter + 1;
-    		//}
-
-
-		//console.log("Count complete");
-
-		//console.log(nextID);
-        	//nextID++;
-		//console.log("Next ID: "+nextID);
-
-		var newvalues = { eventID: 0,  eventName: "Company Lunch", Description: "Company Lunchon sometime", Location: "Invercargill", dateTime: ""};
+		var newvalues = { eventID: 0,  eventName: "", Description: "", Location: "", dateTime: ""};
 		newvalues['dateTime'] = currentDate;
 		newvalues['eventID'] = nextID;
 		newvalues['eventName'] = req.body.eventName;
-                newvalues['Description'] =  req.body.Description;
-                newvalues['Location']    =  req.body.Location;
-                newvalues['dateTime']    =  req.body.dateTime;
+        newvalues['Description'] =  req.body.Description;
+        newvalues['Location']    =  req.body.Location;
+        newvalues['dateTime']    =  req.body.dateTime;
 		//console.log(newvalues);
 
         	dbo.collection("Events").insertOne(newvalues, function(err, result2) {
-            		if (err) throw err;
-            		//console.log("Mongo data: Document updated ADD complete");
-            		//console.log(result2.acknowledged);
-			//result2.push({ eventID: 0 });
-			//result2.append('eventID', nextID);
-			//result2['eventID'] = nextID;
-			const recData = { eventID: 0, acknowledged: "", insertedId:"" };
-			//console.log(newvalues.eventID);
-			recData['eventID'] = newvalues.eventID;
-			recData['acknowledged'] = result2.acknowledged;
-            		recData['insertedId'] = result2.insertedId;
-			//console.log(recData);
-            		db.close();
-            		res.status(200).send(recData);
-			console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
-            	});
-	});
+       		    if (err) throw err;
+			    const recData = { eventID: 0, acknowledged: "", insertedId:"" };
+			    //console.log(newvalues.eventID);
+			    recData['eventID'] = newvalues.eventID;
+			    recData['acknowledged'] = result2.acknowledged;
+            	recData['insertedId'] = result2.insertedId;
+			    //console.log(recData);
+            	db.close();
+            	res.status(200).send(recData);
+                   const fullDate = new Date();
+			       console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
+            });
+	    });
     });
 });
 
 // /delevent endpoint.
-//      Delete a pecified event by eventID
+//      Delete a specified event by eventID
 app.get('/delevent', (req, res) => {
     console.log("Inside /delevent");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -319,31 +364,32 @@ app.get('/delevent', (req, res) => {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
         if (typeof eventid === "undefined") {
-		console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
-		res.status(400).send( { error: "No Event ID supplied" } );
-		return;
+		    console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
+		    res.status(400).send( { error: "No Event ID supplied" } );
+		    return;
         } else  {
-                var query = { eventID : 0 };
-                query['eventID'] = parseInt(eventid);
+            var query = { eventID : 0 };
+            query['eventID'] = parseInt(eventid);
         }
         //console.log("Query String: "+query);
         //console.log(query);
         dbo.collection("Events").deleteOne(query, function(err, result2) {
-		//console.log(result2);
-                const recData = { eventID: 0, acknowledged: "", deletedCount: 0 };
-                //console.log(newvalues.eventID);
-                recData['eventID'] = query.eventID;
-                recData['acknowledged'] = result2.acknowledged;
-                recData['deletedCount'] = result2.deletedCount;
-		res.status(200).send(recData);
-		console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
-		console.log(recData);
-	});
+		    //console.log(result2);
+            const recData = { eventID: 0, acknowledged: "", deletedCount: 0 };
+            //console.log(newvalues.eventID);
+            recData['eventID'] = query.eventID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['deletedCount'] = result2.deletedCount;
+		    res.status(200).send(recData);
+            const fullDate = new Date();
+		    console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
+		    console.log(recData);
+	    });
     });
 });
 
 // /updevent endpoint.
-//      Delete a pecified event by eventID
+//      Update a specified event by eventID
 app.all('/updevent', (req, res) => {
     console.log("Inside /updevent");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -374,18 +420,9 @@ app.all('/updevent', (req, res) => {
                 query['eventID'] = parseInt(eventid);
         }
 
-	//var updateItemsString = { $set: { } };
-	console.log(req.body);
-        //	var iterationCounter =1;
-        //	for (var propertyKey in req.body) {
-        //            console.log("Running iteration " + iterationCounter +
-        //            "\n\t propertyKey variable is: " + propertyKey +
-        //            "\n\t the associated value is: " + req.body[propertyKey] );
-        //            iterationCounter = iterationCounter + 1;
-        //      }
+	    console.log(req.body);
 
-
-	// example const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
+	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
 
         //console.log("Query String: "+query);
         //console.log(query);
@@ -399,18 +436,323 @@ app.all('/updevent', (req, res) => {
                 recData['modifiedCount'] = result2.modifiedCount;
                 recData['upsertedCount'] = result2.upsertedCount;
                 res.status(200).send(recData);
+                const fullDate = new Date();
                 console.log(fullDate.toUTCString()+" /updevent API:  Endpoint call from "+ip+".");
                 console.log(recData);
         });
     });
 });
 
+//===============================================
 
+//===============================================
+//  admin processing endpoints. Will only be available if admin is switched on
+//===============================================
+
+// /dumptokens endpoint.
+// 	dumps the mastertokentable 
+if (admin) {
+app.all('/dumptokens', (req, res) => {
+    console.log("Inside /dumptokens");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if ((authHeader != authKey) && (!disableBearer)) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    };
+
+    res.status(200).send(masterTokenTable);
+    const fullDate = new Date();
+    console.log(fullDate.toUTCString()+" /dumptokens API:  Endpoint call from "+ip+". Sending mastertokentable");
+    expiretokens();
+});
+};
+
+//===============================================
+//  token processing
+//===============================================
+
+// /authenticate endpoint.
+// 	This endpoint must be accessed first to receive a token before doing any user processing
+// Parameters: { "username": "<YourUserName>", "password": "<YourPassWord>" }
+
+app.all('/authenticate', (req, res) => {
+    console.log("Inside /requestauthtoken");
+    expiretokens();
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+
+    if (!req.body.username) {        // Require valid username to be supplied
+        res.status(401).send( { error: 'Authentication Failed' } );
+        console.log("Authentication Error!!! No username supplied.");
+        return;       
+    };
+
+    if (!req.body.password) {        // Require valid username to be supplied
+        res.status(401).send({ error: 'Authentication Failed' } );
+        console.log("Authentication Error!!! No password supplied for "+req.body.username);
+        return;       
+    };
+
+    // Validate username/password
+    // **** TODO
+
+
+    //  Ok, we got to here. All checks passed. Generate and send back auth token.
+    const authToken = req.body.username+":"+generateRandom(10);
+    var tokenElement = {};
+    tokenElement.tokenkey = authToken+":"+ip;
+    tokenElement.expires = Math.floor(Date.now() / 1000) + 1800;  // Expires in 30 mmintues
+    //tokenElement.expires = Math.floor(Date.now() / 1000) + 120;  // Expires in 2 mmintues. Uncomment for testing
+    tokenElement.expired = false;     
+    const expirymilliseconds = tokenElement.expires * 1000;
+    const dateObject = new Date(expirymilliseconds);
+    const expiryDateFormat = dateObject.toLocaleString();
+    tokenElement.expiredatetime = expiryDateFormat;
+    masterTokenTable.push({ tokenElement: tokenElement });
+
+    // Fire back new token and expiry
+    recData = {  };
+    recData.authtoken = authToken;
+    recData.expirytimestamp = tokenElement.expires;
+    recData.expirydatetime = expiryDateFormat;
+    recData.status  = "Authenticated OK";
+    res.status(200).send(recData);
+
+    const fullDate = new Date();
+    console.log(fullDate.toUTCString()+" /updevent API:  Endpoint call from "+ip+". New authToken sent: "+authToken);
+    console.log(masterTokenTable);
+});
+
+//===============================================
+
+//===============================================
+//  User CRUD Endpoints
+//===============================================
+
+// /adduser endpoint.
+// 	Insert a single record into User table
+app.all('/adduser', (req, res) => {
+    expiretokens();
+    console.log("Inside /adduser");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    if (!req.body.authtoken) {        // Require valid auth token to be supplied
+        res.status(401).send({ error: 'Invalid auth token' });
+        console.log("Authentication Error!!! No token supplied.");
+        return;       
+    }
+
+    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
+    console.log("Built token query string: "+tokenquerystring)
+
+    var searchresult = searchtokens(tokenquerystring);
+    console.log(searchresult);
+    if (!searchresult) {
+        res.status(401).send({ error: 'No Auth token or Expired Auth token. Add Failed' });
+        console.log("Authentication Error!!! No valid token in master table.");
+        return;        
+    };
+
+    // Future: Validate incoming data
+
+
+    console.log("Found valid token in master table. Good to go.");
+    console.log(searchresult);
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+    	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
+
+        dbo.collection("Users").find({}).sort({"userid" : -1}).limit(1).toArray(function(err, result1) {
+            if (err) throw err;
+            //console.log(result1[0]);
+            var nextid = 0;
+            if (typeof result1[0] === "undefined") {
+                nextid = 1;
+            } else {
+		        nextid = result1[0].userid + 1;
+            }
+            //console.log("userid: "+nextid);
+		    var newvalues = { };
+            newvalues['userid'] = nextid;
+		    newvalues['username'] = req.body.username;
+		    newvalues['password'] = req.body.password;  // *** TODO: Use CryptoJS to create hashvalue and store hashvalue instead. All auths will be on hashvalue.
+		    newvalues['dateCreated'] = currentDate;
+            newvalues['status'] = 'A';
+            newvalues['userlevel'] = 'S';               // Default to Staff. Future validation - Options S = Staff, A = Admin, U = User
+		    newvalues['staffID'] = '';
+            newvalues['lastLogin'] = '';
+            newvalues['loginIP'] = '';
+		    //console.log(newvalues);
+
+        	dbo.collection("Users").insertOne(newvalues, function(err, result2) {
+            	if (err) {
+                    //throw err;
+                    if (err.code === 11000) {
+                        // Duplicate username
+                        console.log("Duplicate username");
+                        return res.status(422).send({ status: "failed", message: 'User already exist!' });
+                    }
+                    console.log(err);
+                      // Some other error
+                    return res.status(422).send(err);                    
+                };
+			    const recData = { username: '', acknowledged: "", insertedId:"" };
+			    //console.log(newvalues.eventID);
+			    recData['username'] = newvalues.username;
+			    recData['acknowledged'] = result2.acknowledged;
+      		    recData['insertedId'] = result2.insertedId;
+			    //console.log(recData);
+       		    db.close();
+                res.status(200).send(recData);
+                const fullDate = new Date();
+			    console.log(fullDate.toUTCString()+" /adduser API: Endpoint call from "+ip);    
+       	    });
+	    });
+    });
+});
+
+// /upduser endpoint.
+//      Update user details
+app.all('/upduser', (req, res) => {
+    console.log("Inside /upduser");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    
+    if (!req.body.authtoken) {                          // Require valid auth token to be supplied
+        res.status(401).send({ error: 'Invalid auth token' });
+        console.log("Authentication Error!!! No token supplied.");
+        return;       
+    }
+
+    tokenquerystring = req.body.authtoken+":"+ip;       // Build lookup string
+    console.log("Built token query string: "+tokenquerystring)
+
+    var searchresult = searchtokens(tokenquerystring);
+    console.log(searchresult);
+    if (!searchresult) {
+        res.status(401).send({ error: 'No Auth token or Expired Auth token. Add Failed' });
+        console.log("Authentication Error!!! No valid token in master table.");
+        return;        
+    };
+
+    // Future: Validate incoming data
+
+
+    var query = { username: "" };
+    query['username'] = req.body.username;   // Set query: username being updated
+    console.log(query);
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        // The whole request body is sent. It is already in JSON and formatted
+        dbo.collection("Users").updateOne(query, { $set: req.body } , function(err, result2) {
+                //console.log(result2);
+                const recData = {  };
+                //console.log(newvalues.eventID);
+                recData['username'] = query.username;
+                recData['acknowledged'] = result2.acknowledged;
+                recData['matchedCount'] = result2.matchedCount;
+                recData['modifiedCount'] = result2.modifiedCount;
+                recData['upsertedCount'] = result2.upsertedCount;
+                res.status(200).send(recData);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /upduser API:  Endpoint call from "+ip+".");
+                console.log(recData);
+        });
+    });
+});
+
+// /getuser endpoint.
+// 	Retrieve info for specified username
+app.all('/getuser', (req, res) => {
+    expiretokens();
+    console.log("Inside /getuser");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+
+    if (!req.body.authtoken) {        // Require valid auth token to be supplied
+        res.status(401).send({ error: 'Invalid auth token' });
+        console.log("Authentication Error!!! No token supplied.");
+        return;       
+    }
+
+    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
+    console.log("Built token query string: "+tokenquerystring)
+
+    var searchresult = searchtokens(tokenquerystring);
+    console.log(searchresult);
+    if (!searchresult) {
+        res.status(401).send({ error: 'No Auth token or Expired Auth token. Add Failed' });
+        console.log("Authentication Error!!! No valid token in master table.");
+        return;        
+    };
+
+    console.log("Found valid token in master table. Good to go.");
+    console.log(searchresult);
+
+    var username = req.body.username;
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+       	var query = { username : "" };
+		query['username'] = username;
+	    console.log("Query String: "+query);
+        //console.log(query);
+        dbo.collection("Users").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            //console.log("Monogo data");
+            //console.log(result);
+            recData = result;
+            db.close();
+            //console.log("Final Return");
+            //console.log(recData);
+	        //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	        res.setHeader('Access-Control-Allow-Methods', '*');
+            res.status(200).send(recData);
+            const fullDate = new Date();
+	        console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip);
+        });
+    });
+});
 
 
 //===============================================
 
-var server = https.createServer(options, app);
+
+
+if (!disableHTTPS) {
+    var server = https.createServer(options, app);      // Create HTTPS server
+} else {
+    var server = http.createServer(app);       // Create HTTP server
+}
 
 server.listen(port, () => {
   console.log("server starting on port : " + port)
