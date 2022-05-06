@@ -219,9 +219,6 @@ app.all('/addevent', (req, res) => {
         console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
         return;
     }
-    //console.log(authHeader);
-    //var eventid = req.query.eventid;
-    //console.log("Received EventID: "+eventid);
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -231,74 +228,42 @@ app.all('/addevent', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-	var Events = dbo.collection("Users");
+	    var Events = dbo.collection("Users");
 
-        //var query = { id: 3 };
     	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
-	//var newEvent = '{ eventName: "Company Lunch", Description: "Company Lonchon sometime", Location: "Invercargill", datetime: "'+currentDate+'" }';
-	//var newEventString = JSON.stringify(newEvent);
-	//var newvalues = JSON.parse(newEvent);
-	//var newvalues = newEvent;
 
-	// DB Processing
-        // Start by getting the next eventID
-	//console.log("Getting Count");
 	dbo.collection("Events").find({}).sort({"eventID" : -1}).limit(1).toArray(function(err, result1) {
-            	if (err) throw err;
-        	//console.log("Monogo data: Returned for find RESULT1");
-        	//console.log(result1[0]);
+        if (err) throw err;
 		const nextID = result1[0].eventID + 1;
-		//console.log(result1[0].eventID);
-		//console.log(result1[0].eventName);
-        	//console.log(ev);
 
- 		//var iterationCounter =1;
- 		//for (var propertyKey in result1[0]) {
-    		//	console.log("Running iteration " + iterationCounter +
-                //    	"\n\t propertyKey variable is: " + propertyKey +
-                //    	"\n\t the associated value is: " + result1[propertyKey[0]] );
-    		//	iterationCounter = iterationCounter + 1;
-    		//}
-
-
-		//console.log("Count complete");
-
-		//console.log(nextID);
-        	//nextID++;
-		//console.log("Next ID: "+nextID);
-
-		var newvalues = { eventID: 0,  eventName: "Company Lunch", Description: "Company Lunchon sometime", Location: "Invercargill", dateTime: ""};
+		var newvalues = { eventID: 0,  eventName: "", Description: "", Location: "", dateTime: ""};
 		newvalues['dateTime'] = currentDate;
 		newvalues['eventID'] = nextID;
 		newvalues['eventName'] = req.body.eventName;
-                newvalues['Description'] =  req.body.Description;
-                newvalues['Location']    =  req.body.Location;
-                newvalues['dateTime']    =  req.body.dateTime;
+        newvalues['Description'] =  req.body.Description;
+        newvalues['Location']    =  req.body.Location;
+        newvalues['dateTime']    =  req.body.dateTime;
 		//console.log(newvalues);
 
         	dbo.collection("Events").insertOne(newvalues, function(err, result2) {
-            		if (err) throw err;
-            		//console.log("Mongo data: Document updated ADD complete");
-            		//console.log(result2.acknowledged);
-			//result2.push({ eventID: 0 });
-			//result2.append('eventID', nextID);
-			//result2['eventID'] = nextID;
-			const recData = { eventID: 0, acknowledged: "", insertedId:"" };
-			//console.log(newvalues.eventID);
-			recData['eventID'] = newvalues.eventID;
-			recData['acknowledged'] = result2.acknowledged;
-            		recData['insertedId'] = result2.insertedId;
-			//console.log(recData);
-            		db.close();
-            		res.status(200).send(recData);
-			console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
-            	});
-	});
+       		    if (err) throw err;
+			    const recData = { eventID: 0, acknowledged: "", insertedId:"" };
+			    //console.log(newvalues.eventID);
+			    recData['eventID'] = newvalues.eventID;
+			    recData['acknowledged'] = result2.acknowledged;
+            	recData['insertedId'] = result2.insertedId;
+			    //console.log(recData);
+            	db.close();
+            	res.status(200).send(recData);
+                   const fullDate = new Date();
+			       console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
+            });
+	    });
     });
 });
 
 // /delevent endpoint.
-//      Delete a pecified event by eventID
+//      Delete a specified event by eventID
 app.get('/delevent', (req, res) => {
     console.log("Inside /delevent");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -321,31 +286,32 @@ app.get('/delevent', (req, res) => {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
         if (typeof eventid === "undefined") {
-		console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
-		res.status(400).send( { error: "No Event ID supplied" } );
-		return;
+		    console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
+		    res.status(400).send( { error: "No Event ID supplied" } );
+		    return;
         } else  {
-                var query = { eventID : 0 };
-                query['eventID'] = parseInt(eventid);
+            var query = { eventID : 0 };
+            query['eventID'] = parseInt(eventid);
         }
         //console.log("Query String: "+query);
         //console.log(query);
         dbo.collection("Events").deleteOne(query, function(err, result2) {
-		//console.log(result2);
-                const recData = { eventID: 0, acknowledged: "", deletedCount: 0 };
-                //console.log(newvalues.eventID);
-                recData['eventID'] = query.eventID;
-                recData['acknowledged'] = result2.acknowledged;
-                recData['deletedCount'] = result2.deletedCount;
-		res.status(200).send(recData);
-		console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
-		console.log(recData);
-	});
+		    //console.log(result2);
+            const recData = { eventID: 0, acknowledged: "", deletedCount: 0 };
+            //console.log(newvalues.eventID);
+            recData['eventID'] = query.eventID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['deletedCount'] = result2.deletedCount;
+		    res.status(200).send(recData);
+            const fullDate = new Date();
+		    console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
+		    console.log(recData);
+	    });
     });
 });
 
 // /updevent endpoint.
-//      Delete a pecified event by eventID
+//      Update a specified event by eventID
 app.all('/updevent', (req, res) => {
     console.log("Inside /updevent");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -376,18 +342,9 @@ app.all('/updevent', (req, res) => {
                 query['eventID'] = parseInt(eventid);
         }
 
-	//var updateItemsString = { $set: { } };
-	console.log(req.body);
-        //	var iterationCounter =1;
-        //	for (var propertyKey in req.body) {
-        //            console.log("Running iteration " + iterationCounter +
-        //            "\n\t propertyKey variable is: " + propertyKey +
-        //            "\n\t the associated value is: " + req.body[propertyKey] );
-        //            iterationCounter = iterationCounter + 1;
-        //      }
+	    console.log(req.body);
 
-
-	// example const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
+	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
 
         //console.log("Query String: "+query);
         //console.log(query);
@@ -401,13 +358,12 @@ app.all('/updevent', (req, res) => {
                 recData['modifiedCount'] = result2.modifiedCount;
                 recData['upsertedCount'] = result2.upsertedCount;
                 res.status(200).send(recData);
+                const fullDate = new Date();
                 console.log(fullDate.toUTCString()+" /updevent API:  Endpoint call from "+ip+".");
                 console.log(recData);
         });
     });
 });
-
-
 
 
 //===============================================

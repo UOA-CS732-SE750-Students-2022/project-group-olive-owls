@@ -1,7 +1,7 @@
-
+//Author - Syed Kazmi
 import * as React from 'react';
 import RecordsTable from '../component/RecordsTable';
-import MenuBar from '../component/Menubar';
+import TableMenuBar from '../component/TableMenubar';
 import { Container } from '@mui/material';
 import { Box } from '@mui/system';
 function Records() {
@@ -11,7 +11,7 @@ function Records() {
     <Container>
     <h1>Records</h1>
     <Container maxWidth="xs">
-    <MenuBar />     
+    <TableMenuBar />     
     </Container>
     <RecordsTable /> 
     </Container>
