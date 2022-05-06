@@ -12,9 +12,9 @@ function Records() {
   const recordLoading = getData.isLoading;
   return (
     <div>
-    <Container>
+    <Container sx={{mb:4}}>
     <h1>Records</h1>
-    <Container maxWidth="xs">
+    <Container sx={{my:4}} maxWidth="xs">
     <TableMenuBar render={reRender} setRender={setreRender}/>     
     </Container>
     <RecordsTable data={recordsData} loading={recordLoading}/> 

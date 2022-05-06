@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete'
 import Container from "@mui/material/Container";
 import axios from 'axios';
-import Alert from '@mui/material/Alert';
 
 
 import Dialog from '@mui/material/Dialog';
@@ -28,7 +27,7 @@ export default function TableMenubar(props) {
 
     const handleSubmitDel = async (e) => {
         e.preventDefault();
-        console.log(eventIDVal);
+        //console.log(eventIDVal);
         try {
           const res = await axios.get("http://localhost:8010/delevent", 
           { params: { eventid: eventIDVal },
@@ -43,13 +42,14 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
+        seteventIDVal("");
         handleCloseDel();
         props.setRender(!props.render);
       };
 
     const handleSubmitAdd = async (e) => {
         e.preventDefault();
-        console.log(eventIDVal);
+        //console.log(eventIDVal);
         try {
         const res = await axios.post("http://localhost:8010/addevent", 
         {  
@@ -68,12 +68,16 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
+        seteventNameVal("");
+        seteventDescVal("");
+        seteventLocVal("");
+        seteventDateVal("");
         handleCloseAdd();
         props.setRender(!props.render);
       };
     const handleSubmitEdit = async (e) => {
         e.preventDefault();
-        console.log(eventIDVal);
+        //console.log(eventIDVal);
         try {
         const res = await axios.post("http://localhost:8010/updevent", 
         {  eventid: eventIDVal,
@@ -93,6 +97,11 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
+        seteventIDVal("");
+        seteventNameVal("");
+        seteventDescVal("");
+        seteventLocVal("");
+        seteventDateVal("");
         handleCloseEdit();
         props.setRender(!props.render);
       };
@@ -136,7 +145,7 @@ export default function TableMenubar(props) {
         <DialogTitle>Edit Event</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please Enter the EventID and the Information you would like to add into that entry 
+            Please Enter the EventID and the Information you would like to add into that entry.
           </DialogContentText>
           <TextField
             autoFocus
@@ -204,7 +213,7 @@ export default function TableMenubar(props) {
         <DialogTitle>Add Event</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please Enter the Information you would like to add into the new entry 
+            Please Enter the Information you would like to add into the new entry. 
           </DialogContentText>
           <TextField
             autoFocus
@@ -262,7 +271,7 @@ export default function TableMenubar(props) {
         <DialogTitle>Delete Event</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please Enter the EventID of the event you would like to delete 
+            Please Enter the EventID of the event you would like to delete.
           </DialogContentText>
           <TextField
             autoFocus
