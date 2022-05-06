@@ -59,7 +59,6 @@ export default function TableMenubar() {
         } ,
           {headers: {"Authorization" : "Bearer 1234567890"}}
             );
-          let resJson = await res.data;
           if (res.status === 200) {
             console.log("User Added successfully");
           } else {
@@ -70,6 +69,32 @@ export default function TableMenubar() {
         }
         handleCloseAdd();
       };
+    const handleSubmitEdit = async (e) => {
+        e.preventDefault();
+        console.log(eventIDVal);
+        try {
+        const res = await axios.post("http://localhost:8010/updevent", 
+        {  eventid: eventIDVal,
+            eventName: eventNameVal,
+            Description: eventDescVal,
+            Location:eventLocVal,
+            dateTime:eventDateVal
+        } ,
+          {params: { eventid: eventIDVal },
+          headers: {"Authorization" : "Bearer 1234567890"}}
+            );
+          if (res.status === 200) {
+            console.log("User Added successfully");
+          } else {
+            console.log("Some error occured");
+          }
+        } catch (err) {
+          console.log(err);
+        }
+        handleCloseAdd();
+      };
+    
+
 
     const handleClickOpenEdit = () => {
         setOpenEdit(true);
@@ -169,7 +194,7 @@ export default function TableMenubar() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEdit}>Cancel</Button>
-          <Button type='Submit' onClick={handleCloseEdit}>Edit Event</Button>
+          <Button onClick={handleSubmitEdit}>Edit Event</Button>
         </DialogActions>
       </Dialog>
       <Dialog open={openAdd} onClose={handleCloseAdd}>
