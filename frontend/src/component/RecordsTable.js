@@ -7,23 +7,17 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
-import useGet from '../component/useGet';
+import LoadingGif from '../Images/loading.gif';
 import { Container } from '@mui/material';
 
-export default function BasicTable() {
-  const getData = useGet('http://localhost:8010/getevent');
-  const recordsData = getData.data;
-  const recordLoading = getData.isLoading;
-  React.useEffect(() => {
-  }, []);
+export default function RecordsTable({data, loading}) {
+  const recordsData = data;
+  const recordLoading = loading;
+ 
   if(recordLoading){
-    return (<Container>IS LOADING</Container>)
+    return (<Container> <img alt="Loading" src={LoadingGif} /> </Container>)
   }
   else if (!recordLoading && recordsData?.length) { //
-    
-  
-
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -50,7 +44,7 @@ export default function BasicTable() {
               <TableCell align="right">{row.eventName}</TableCell>
               <TableCell align="right">{row.Description}</TableCell>
               <TableCell align="right">{row.Location}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+              <TableCell align="right">{row.dateTime}</TableCell>
             </TableRow>
           ))}
         </TableBody>

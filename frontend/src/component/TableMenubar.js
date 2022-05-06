@@ -16,7 +16,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-export default function TableMenubar() {
+export default function TableMenubar(props) {
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
     const [openDel, setOpenDel] = React.useState(false);
@@ -44,6 +44,7 @@ export default function TableMenubar() {
           console.log(err);
         }
         handleCloseDel();
+        props.setRender(!props.render);
       };
 
     const handleSubmitAdd = async (e) => {
@@ -68,6 +69,7 @@ export default function TableMenubar() {
           console.log(err);
         }
         handleCloseAdd();
+        props.setRender(!props.render);
       };
     const handleSubmitEdit = async (e) => {
         e.preventDefault();
@@ -91,7 +93,8 @@ export default function TableMenubar() {
         } catch (err) {
           console.log(err);
         }
-        handleCloseAdd();
+        handleCloseEdit();
+        props.setRender(!props.render);
       };
     
 
