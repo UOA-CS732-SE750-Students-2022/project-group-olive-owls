@@ -84,7 +84,7 @@ export default function TableMenubar() {
           headers: {"Authorization" : "Bearer 1234567890"}}
             );
           if (res.status === 200) {
-            console.log("User Added successfully");
+            console.log("User Edited successfully");
           } else {
             console.log("Some error occured");
           }
