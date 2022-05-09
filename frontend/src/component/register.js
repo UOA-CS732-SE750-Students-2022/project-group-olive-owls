@@ -31,28 +31,22 @@ export default function Register() {
   let navigate = useNavigate();
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openFail, setOpenFail] = React.useState(false);
-  const handleClickOpenSuccess = () => {
-    setOpenSuccess(true);
-  };
 const handleCloseSuccess = () => {
   setOpenSuccess(false);
   };
   const handleRedirectToLogin = () => {
     navigate('/login');
     };
-  const handleClickOpenFail = () => {
-    setOpenFail(true);
-  };
 const handleCloseFail = () => {
   setOpenFail(false);
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    // console.log({
+    //   email: data.get('email'),
+    //   password: data.get('password'),
+    // });
     try {
       const res = await axios.post("http://localhost:8010/adduser", 
       {  username: data.get('email'),
@@ -148,11 +142,10 @@ const handleCloseFail = () => {
         <DialogContent>
           <DialogContentText>
             Something went wrong, please try registering again
-            {}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseSuccess}>Close</Button>
+          <Button onClick={handleCloseFail}>Close</Button>
         </DialogActions>
       </Dialog>
       </Container>
