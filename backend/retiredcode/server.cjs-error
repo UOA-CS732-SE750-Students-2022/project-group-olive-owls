@@ -4,11 +4,6 @@
 //      It will handle all backend processing requests for the COVID app
 //   which is being designed for the group project submission for CS732/SE750.
 //
-//      There are 3 control switches that control activation of features in the server backend.
-//          # "disableHTTPS" which allows HTTPS to be switched on or off in code.                           Default: true
-//          # "disableBEARER" which allows bearer authentication to be switched on or off in code.          Default: false
-//          # "admin" which allows admin endpoints switched on or off in code. (useful for debugging)       Default: true
-//
 // ##################################
 //   Modification History
 // ##################################
@@ -30,12 +25,6 @@
 //          # User Token Authentication processing
 //          # CRUD funtions against user authentication table entries
 //          # STILL TODO: Authenticaton logging
-//
-//   Date: 10/5/2022                            S. Schmidt
-//   Desc:  Removed token validation in endpoint /adduser. 
-//          Added new endpoint to Users. /verifytoken
-//           - Confirms supplied token is valid
-//          Added cors (cross-origin resource sharing) library.
 //
 
 function generateRandom (len) {
@@ -103,13 +92,11 @@ const express = require('express');
 const https = require('https');
 const http  = require('http');
 const fs = require('fs');
-const cors = require('cors');
 
 const axios = require('axios');
 const path = require('path');
 const { Console } = require("console");
 const { exit } = require("process");
-const { response } = require("express");
 
 const axiosKey = "d802faa0-10bd-11ec-b2fe-47a0872c6708";
 const authKey = "Bearer 1234567890";
@@ -136,9 +123,7 @@ if (!disableHTTPS) {
     }
 };
 
-app = express();
-
-app.use(cors());
+app = express()
 
 app.use(express.json())
 
@@ -459,6 +444,7 @@ app.all('/updevent', (req, res) => {
 });
 
 //===============================================
+<<<<<<< Updated upstream
 
 //===============================================
 //  admin processing endpoints. Will only be available if admin is switched on
@@ -515,7 +501,8 @@ app.all('/authenticate', (req, res) => {
     };
 
     // Validate username/password
-    // Future Change: TODO: This will be completed once auth mode has been decided
+    // **** TODO
+
 
     //  Ok, we got to here. All checks passed. Generate and send back auth token.
     const authToken = req.body.username+":"+generateRandom(10);
@@ -548,44 +535,6 @@ app.all('/authenticate', (req, res) => {
 //===============================================
 //  User CRUD Endpoints
 //===============================================
-
-// /verifytoken endpoint.
-// 	Verify token is valid
-app.all('/verifytoken', (req, res) => {
-    expiretokens();
-    console.log("Inside /verifytoken");
-    console.log(req.body);
-    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    ip = ip.replace('::ffff:', '');
-
-    if (!req.body.authtoken) {        // Require valid auth token to be supplied
-        res.status(401).send({ msg: 'Invalid auth token supplied', validtoken: false });
-        console.log("Authentication Error!!! No token supplied.");
-        return;       
-    }
-
-    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
-    console.log("Built token query string: "+tokenquerystring)
-
-    var searchresult = searchtokens(tokenquerystring);
-    //console.log(searchresult);
-    if (!searchresult) {
-        res.status(401).send({ msg: 'No Auth token or Expired Auth token', validtoken: false });
-        console.log("Authentication Error!!! No valid token in master table.");
-        return;        
-    };
-
-    console.log("Found valid token in master table. token: "+req.body.authtoken+"   Expires: "+searchresult.tokenElement.expiredatetime);
-    var responsertn = { };
-    responsertn.msg = 'Token Valid';
-    responsertn.expiredatetime = '';
-    const expiredatetime = searchresult.tokenElement.expiredatetime;
-    responsertn.expiredatetime = expiredatetime;
-    responsertn.validtoken = true;
-    res.status(200).send(responsertn);    
-    console.log(fullDate.toUTCString()+" /verifytoken API:  Endpoint call from "+ip+". Result sent: "+responsertn);
-    //console.log(searchresult);
-});
 
 // /adduser endpoint.
 // 	Insert a single record into User table
@@ -766,6 +715,28 @@ app.all('/getuser', (req, res) => {
     console.log(searchresult);
 
     var username = req.body.username;
+=======
+
+//===============================================
+//  Bubble Endpoints
+//===============================================
+
+// /getbubble endpoint.
+// 	Retrieve all events or event specified by eventID
+app.get('/getbubble', (req, res) => {
+    console.log("Inside /getbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+    //console.log(authHeader);
+    var bubbleid = req.query.bubbleid;
+    //console.log("Received bubbleID: "+bubbleid);
+>>>>>>> Stashed changes
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -774,11 +745,23 @@ app.all('/getuser', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
+<<<<<<< Updated upstream
        	var query = { username : "" };
 		query['username'] = username;
 	    console.log("Query String: "+query);
         //console.log(query);
         dbo.collection("Users").find(query).toArray(function(err, result) {
+=======
+	    if (typeof eventid === "undefined") {
+  		    var query = {};
+	    } else	{
+            var query = { bubbleid : 0 };
+		    query['bubbleid'] = parseInt(bubbleid);
+	    }
+	    //console.log("Query String: "+query);
+        //console.log(query);
+        dbo.collection("Bubbles").find(query).toArray(function(err, result) {
+>>>>>>> Stashed changes
             if (err) throw err;
             //console.log("Monogo data");
             //console.log(result);
@@ -789,8 +772,12 @@ app.all('/getuser', (req, res) => {
 	        //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 	        res.setHeader('Access-Control-Allow-Methods', '*');
             res.status(200).send(recData);
+<<<<<<< Updated upstream
             const fullDate = new Date();
 	        console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip);
+=======
+	        console.log(fullDate.toUTCString()+" /getbubble API:  Endpoint call from "+ip);
+>>>>>>> Stashed changes
         });
     });
 });
@@ -809,3 +796,4 @@ if (!disableHTTPS) {
 server.listen(port, () => {
   console.log("server starting on port : " + port)
 });
+

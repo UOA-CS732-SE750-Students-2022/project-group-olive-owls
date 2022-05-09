@@ -11,6 +11,7 @@ Not all may be required.
 - Required modules, need to be installed
 "yarn add esm"
 "yarn add axios"
+"npm install cors"
 
 - MongoDB library
 "yarn add mongodb"
