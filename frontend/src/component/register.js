@@ -10,23 +10,68 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useNavigate 
 } from "react-router-dom";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 //import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import axios from 'axios';
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 
 export default function Register() {
-  const handleSubmit = (event) => {
+  let navigate = useNavigate();
+  const [openSuccess, setOpenSuccess] = React.useState(false);
+  const [openFail, setOpenFail] = React.useState(false);
+  const handleClickOpenSuccess = () => {
+    setOpenSuccess(true);
+  };
+const handleCloseSuccess = () => {
+  setOpenSuccess(false);
+  };
+  const handleRedirectToLogin = () => {
+    navigate('/login');
+    };
+  const handleClickOpenFail = () => {
+    setOpenFail(true);
+  };
+const handleCloseFail = () => {
+  setOpenFail(false);
+  };
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get('email'),
       password: data.get('password'),
     });
+    try {
+      const res = await axios.post("http://localhost:8010/adduser", 
+      {  username: data.get('email'),
+          password: data.get('password')
+      }
+          );
+        if (res.status === 200) {
+          console.log("User Created successfully");
+          setOpenSuccess(true);
+        } else {
+          console.log("Some error occured");
+          console.log(res.data);
+          setOpenFail(true);
+        }
+      } catch (err) {
+        console.log(err);
+        setOpenFail(true);
+      }
+
   };
 
   return (
@@ -44,29 +89,8 @@ export default function Register() {
           <Typography component="h1" variant="h5">
             Register
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
@@ -74,6 +98,7 @@ export default function Register() {
                   id="email"
                   label="Email Address"
                   name="email"
+                  type="email"
                   autoComplete="email"
                 />
               </Grid>
@@ -90,7 +115,6 @@ export default function Register() {
               </Grid>
               
             </Grid>
-            <Link to='/'>
             <Button
               type="submit"
               fullWidth
@@ -98,7 +122,7 @@ export default function Register() {
               sx={{ mt: 3, mb: 2 }}
             >
               Sign Up
-            </Button></Link>
+            </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 
@@ -107,7 +131,30 @@ export default function Register() {
           </Box>
           
         </Box>
-        
+      <Dialog open={openSuccess} onClose={handleCloseSuccess}>
+        <DialogTitle>Successfully Registered</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            You are now successfully registered, please login.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSuccess}>Close</Button>
+          <Button onClick={handleRedirectToLogin}>Login</Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openFail} onClose={handleCloseFail}>
+        <DialogTitle>Registration not successfull</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Something went wrong, please try registering again
+            {}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSuccess}>Close</Button>
+        </DialogActions>
+      </Dialog>
       </Container>
     
   );
