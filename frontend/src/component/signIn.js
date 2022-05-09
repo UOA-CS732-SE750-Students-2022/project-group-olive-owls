@@ -10,23 +10,57 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-    Link
+    Link,
+    useNavigate
   } from "react-router-dom";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 //import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import axios from 'axios';
 
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 
 export default function SignIn() {
-  const handleSubmit = (event) => {
+  let navigate = useNavigate();
+  const [openFail, setOpenFail] = React.useState(false);
+const handleCloseFail = () => {
+  setOpenFail(false);
+  };
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    // console.log({
+    //   email: data.get('email'),
+    //   password: data.get('password'),
+    // }); 
+    try {
+      const res = await axios.post("http://localhost:8010/authenticate", 
+      {  username: data.get('email'),
+          password: data.get('password')
+      }
+          );
+        if (res.status === 200) {
+          if (res.data.authtoken) {
+            localStorage.setItem("user", JSON.stringify(res.data));
+            console.log("User Signed in successfully");
+            navigate('/home');
+          }
+        } else {
+          console.log("Some error occured");
+          console.log(res.data);
+          setOpenFail(true);
+        }
+      } catch (err) {
+        console.log(err);
+        setOpenFail(true);
+      }
+
   };
 
   return (
@@ -44,7 +78,7 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
               margin="normal"
               required
@@ -52,7 +86,7 @@ export default function SignIn() {
               id="email"
               label="Email Address"
               name="email"
-              autoComplete="email"
+              type="email"
               autoFocus
             />
             <TextField
@@ -63,21 +97,15 @@ export default function SignIn() {
               label="Password"
               type="password"
               id="password"
-              autoComplete="current-password"
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <Link to='/'>
+            
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button></Link>
+            >Sign In
+            </Button>
             <Grid container>
               <Grid item xs>
                
@@ -89,7 +117,17 @@ export default function SignIn() {
           </Box>
 
         </Box>
-        
+      <Dialog open={openFail} onClose={handleCloseFail}>
+        <DialogTitle>Registration not successfull</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Something went wrong, please try signing again
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFail}>Close</Button>
+        </DialogActions>
+      </Dialog>
       </Container>
     
   );
