@@ -37,9 +37,9 @@ const handleCloseFail = () => {
     // console.log({
     //   email: data.get('email'),
     //   password: data.get('password'),
-    // }); 
+    // });
     try {
-      const res = await axios.post("http://localhost:8010/authenticate", 
+      const res = await axios.post("http://localhost:8010/authenticate",
       {  username: data.get('email'),
           password: data.get('password')
       }
@@ -97,7 +97,7 @@ const handleCloseFail = () => {
               type="password"
               id="password"
             />
-            
+
             <Button
               type="submit"
               fullWidth
