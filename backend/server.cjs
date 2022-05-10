@@ -41,6 +41,16 @@
 //   Desc:  Added new endpoints for Association table
 //           - /addassoc     /getassoc    /delassoc
 //
+//   Date: 11/5/2022                            S. Schmidt
+//   Desc:  Added new CRUD endpoints for Staff table
+//           - /addstaff     /getstaff    /updstaff     /desctivatestaff
+//          Change MongoDB connection string to be a central varible that functions reference rather than a 
+//           string in the local functions.
+//          Added createindex on ID's for Staff, Associations & Events.
+//           Ensures ID's are unique and lookups are faster. 
+//             When insertOne functions are processed by MongoDB, if the table doesn't exist, it will be created 
+//             and then a unique index added on the ID for the table.
+//
 
 function generateRandom (len) {
     var crypto = require("crypto");
@@ -128,6 +138,8 @@ const disableBearer = true;     // Disable Bearer Auth for dev mode. Change to t
 const admin = true;             // Admin processing functions available like dumpmastertokens endpoint for debugging
 const port = 8010;              // Port number to open server on 
 
+var MongoDBConnString = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
 console.info("Inside server.js   Start: "+date.getTime);
 
 // Load HTTPS cert
@@ -195,16 +207,17 @@ app.get('/queryname', (req, res) => {
     console.log("Inside /queryname. Client IP: "+ip);
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
         console.log("QueryName");
-        console.log(req.query.id);
+        console.log(req.query.userid);
         //var query = { first_name: req.query.name };
-        var id = parseInt(req.query.id);
-        var query = { id: id };
+        var id = parseInt(req.query.userid);
+        var query = { userid: id };
         console.log(query);
         dbo.collection("Users").find(query).toArray(function(err, result) {
             if (err) throw err;
@@ -243,7 +256,8 @@ app.get('/mongoquery', (req, res) => {
     console.log(authHeader);
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -290,7 +304,8 @@ app.get('/getevent', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -338,7 +353,8 @@ app.all('/addevent', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
 
     MongoClient.connect(url, function(err, db) {
@@ -369,10 +385,12 @@ app.all('/addevent', (req, res) => {
 			    recData['acknowledged'] = result2.acknowledged;
             	recData['insertedId'] = result2.insertedId;
 			    //console.log(recData);
-            	db.close();
             	res.status(200).send(recData);
-                   const fullDate = new Date();
-			       console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
+                const fullDate = new Date();
+			    console.log(fullDate.toUTCString()+" /addevent API: New eventID: "+newvalues.eventID+"  Endpoint call from "+ip);
+                // Catchall. Makesure an index exists for staffID. Ensures a unique ID and quick lookups.
+                dbo.collection("Events").createIndex( { "eventID": 1 }, { unique: true } );
+                //db.close();
             });
 	    });
     });
@@ -398,7 +416,8 @@ app.get('/delevent', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -448,7 +467,8 @@ app.all('/updevent', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -466,8 +486,8 @@ app.all('/updevent', (req, res) => {
 
 	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
 
-        //console.log("Query String: "+query);
-        //console.log(query);
+        console.log("Query String: "+query);
+        console.log(query);
         dbo.collection("Events").updateOne(query, { $set: req.body } , function(err, result2) {
                 //console.log(result2);
                 const recData = { eventID: 0 };
@@ -650,7 +670,8 @@ app.all('/adduser', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
 
 
     MongoClient.connect(url, function(err, db) {
@@ -741,7 +762,8 @@ app.all('/upduser', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -798,7 +820,8 @@ app.all('/getuser', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -868,7 +891,8 @@ app.all('/addassoc', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
 
 
     MongoClient.connect(url, function(err, db) {
@@ -901,10 +925,11 @@ app.all('/addassoc', (req, res) => {
             recData['insertedId'] = result2.insertedId;
             recData['status'] = 'Association Saved';
 			//console.log(recData);
-       		db.close();
+       		//db.close();
             res.status(200).send(recData);
             const fullDate = new Date();
 			console.log(fullDate.toUTCString()+" /addassoc API: Endpoint call from "+ip);    
+            dbo.collection("Associations").createIndex( { "associd": 1 }, { unique: true } );
 	    });
     });
 });
@@ -938,7 +963,8 @@ app.all('/getassoc', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -1002,7 +1028,8 @@ app.all('/delassoc', (req, res) => {
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
-    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
     //var recData = '';
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -1034,11 +1061,261 @@ app.all('/delassoc', (req, res) => {
 //===============================================
 
 //===============================================
-//  Bubble CRUD Endpoints
+//  Staff CRUD Endpoints
 //===============================================
 
-// /??? endpoint.
-// 	Some more info
+// /addstaff     /getstaff    /updstaff     /deactivatestaff
+
+// /addstaff endpoint.
+// 	Insert a single record into Staff table
+app.all('/addstaff', (req, res) => {
+    expiretokens();
+    console.log("Inside /addstaff");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    // Future: Validate information received.
+
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+    	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
+
+        dbo.collection("Staff").find({}).sort({"staffID" : -1}).limit(1).toArray(function(err, result1) {
+            if (err) throw err;
+            //console.log(result1[0]);
+            var nextid = 0;
+            if (typeof result1[0] === "undefined") {
+                nextid = 1;
+            } else {
+		        nextid = result1[0].staffID + 1;
+            }
+            //console.log("userid: "+nextid);
+		    var newvalues = { };
+            newvalues['staffID'] = nextid;
+		    newvalues['firstName'] = req.body.firstName;
+		    newvalues['surname'] = req.body.surname;  // *** TODO: Use CryptoJS to create hashvalue and store hashvalue instead. All auths will be on hashvalue.
+		    newvalues['startDate'] = currentDate;
+            newvalues['endDate'] = '';
+            newvalues['DOB'] = '';
+            newvalues['active'] = 'Y';                  // status
+		    console.log(newvalues);
+
+        	dbo.collection("Staff").insertOne(newvalues, function(err, result2) {
+            	if (err) {
+                    //throw err;
+                    if (err.code === 11000) {
+                        // Duplicate username
+                        console.log("Duplicate username");
+                        return res.status(422).send({ status: "failed", message: 'User already exist!' });
+                    }
+                    console.log(err);
+                      // Some other error
+                    return res.status(422).send(err);                    
+                };
+			    //const recData = { staffID: '', acknowledged: "", insertedId:"" };
+                var recData = {  };
+			    //console.log(newvalues.eventID);
+			    recData['staffID'] = newvalues.staffID;
+                recData['firstName'] = newvalues.firstName;
+                recData['surname'] = newvalues.surname;
+                recData['startDate'] = newvalues.startDate;
+                recData['endDate'] = newvalues.endDate;
+                recData['DOB'] = newvalues.DOB;
+                recData['active'] = newvalues.active;
+			    recData['acknowledged'] = result2.acknowledged;
+      		    recData['insertedId'] = result2.insertedId;
+                recData['status'] = 'Staff Record added';
+			    //console.log(recData);
+                res.status(200).send(recData);
+                const fullDate = new Date();
+			    console.log(fullDate.toUTCString()+" /addstaff API: Endpoint call from "+ip);    
+                // Catchall. Makesure an index exists for staffID. Ensures a unique ID and quick lookups.
+                dbo.collection("Staff").createIndex( { "staffID": 1 }, { unique: true } );
+       	    });
+	    });
+    });
+});
+
+// /getstaff endpoint.
+// 	Retrieve a staff record
+app.all('/getstaff', (req, res) => {
+    expiretokens();
+    console.log("Inside /getstaff");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    if (req.body.staffID) {        // Require staff ID to be supplied
+        var staffid = req.body.staffID
+    } else {
+        var staffid = '';
+    }
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+       	var query = { };
+        // Will load each parameter received. If none, then the query string will be empty returning all.
+		if (staffid) { query['staffID'] = staffid; };        
+	    console.log("Query String: "+query);
+        console.log(query);
+        dbo.collection("Staff").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            recData = result;
+            db.close();
+            res.status(200).send(recData);
+            const fullDate = new Date();
+	        console.log(fullDate.toUTCString()+" /getstaff API:  Endpoint call from "+ip);
+        });
+    });
+});
+
+// /updstaff endpoint.
+//      Update a specified Staff record
+app.all('/updstaff', (req, res) => {
+    console.log("Inside /updevent");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    // Future Change: Validate the inbound data
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        var staffID = req.body.staffID;
+        if (typeof staffID === "undefined") {
+                console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No staffID specified. Exiting.");
+                res.status(400).send( { error: "No staffID supplied" } );
+                return;
+        } else  {
+                var query = { };
+                query["staffID"] = parseInt(staffID);
+        }
+
+	    console.log(req.body);
+
+	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
+
+        console.log("Query String: "+query);
+        console.log(query);
+        dbo.collection("Staff").updateOne(query, { $set: req.body } , function(err, result2) {
+                //console.log(result2);
+                var recData = { };
+                //console.log(newvalues.eventID);
+                recData['staffID'] = query.staffID;
+                recData['acknowledged'] = result2.acknowledged;
+                recData['matchedCount'] = result2.matchedCount;
+                recData['modifiedCount'] = result2.modifiedCount;
+                recData['upsertedCount'] = result2.upsertedCount;
+                res.status(200).send(recData);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /updstaff API:  Endpoint call from "+ip+".");
+                console.log(recData);
+        });
+    });
+});
+
+// /deactivatestaff endpoint.
+//      Update a specified Staff record
+app.all('/deactivatestaff', (req, res) => {
+    console.log("Inside /deactivatestaff");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    // Future Change: Validate the inbound data
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        var staffID = req.body.staffID;
+        if (typeof staffID === "undefined") {
+                console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No staffID specified. Exiting.");
+                res.status(400).send( { error: "No staffID supplied" } );
+                return;
+        } else  {
+                var query = { };
+                query["staffID"] = parseInt(staffID);
+        }
+
+        req.body.active = "N";
+	    console.log(req.body);
+
+	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
+
+        console.log("Query String: "+query);
+        console.log(query);
+        dbo.collection("Staff").updateOne(query, { $set: req.body } , function(err, result2) {
+                //console.log(result2);
+                var recData = { };
+                //console.log(newvalues.eventID);
+                recData['staffID'] = query.staffID;
+                recData['acknowledged'] = result2.acknowledged;
+                recData['matchedCount'] = result2.matchedCount;
+                recData['modifiedCount'] = result2.modifiedCount;
+                recData['upsertedCount'] = result2.upsertedCount;
+                res.status(200).send(recData);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /deactivatestaff API:  Endpoint call from "+ip+".");
+                console.log(recData);
+        });
+    });
+});
+
 
 
 //===============================================
