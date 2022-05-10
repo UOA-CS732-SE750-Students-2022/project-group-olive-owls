@@ -6,7 +6,7 @@
 //
 //      There are 3 control switches that control activation of features in the server backend.
 //          # "disableHTTPS" which allows HTTPS to be switched on or off in code.                           Default: true
-//          # "disableBEARER" which allows bearer authentication to be switched on or off in code.          Default: false
+//          # "disableBEARER" which allows bearer authentication to be switched on or off in code.          Default: true
 //          # "admin" which allows admin endpoints switched on or off in code. (useful for debugging)       Default: true
 //
 // ##################################
@@ -36,6 +36,10 @@
 //          Added new endpoint to Users. /verifytoken
 //           - Confirms supplied token is valid
 //          Added cors (cross-origin resource sharing) library.
+//
+//   Date: 11/5/2022                            S. Schmidt
+//   Desc:  Added new endpoints for Association table
+//           - /addassoc     /getassoc    /delassoc
 //
 
 function generateRandom (len) {
@@ -155,8 +159,16 @@ app.get('/axiostst', async (req, res) => {
     console.log("Inside /axiostst");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
-    //const loc = await axios.get('https://geolocation-db.com/json/');
-    //const callString = 'https://geolocation-db.com/jsonp/'+axiosKey+'/'+ip;
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    // ip="114.23.125.78";   // Test IP. Located in Auckland.
     const loc = await axios.get('https://geolocation-db.com/jsonp/'+axiosKey+'/'+ip);
     //console.log(loc);
     console.log("Client IP: "+ip+"     JSON Response sent");
@@ -170,11 +182,14 @@ app.get('/queryname', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
     console.log(authHeader);
 
     console.log("Inside /queryname. Client IP: "+ip);
@@ -217,11 +232,14 @@ app.get('/mongoquery', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-	res.status(401).send('Authentication Error.');
-	console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-	return; 
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
     console.log(authHeader);
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -258,11 +276,14 @@ app.get('/getevent', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
     //console.log(authHeader);
     var eventid = req.query.eventid;
     //console.log("Received EventID: "+eventid);
@@ -307,11 +328,13 @@ app.all('/addevent', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -362,11 +385,13 @@ app.get('/delevent', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
     //console.log(authHeader);
     var eventid = req.query.eventid;
     //console.log("Received EventID: "+eventid);
@@ -410,11 +435,13 @@ app.all('/updevent', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
     //console.log(authHeader);
     var eventid = req.query.eventid;
     //console.log("Received EventID: "+eventid);
@@ -467,23 +494,25 @@ app.all('/updevent', (req, res) => {
 // /dumptokens endpoint.
 // 	dumps the mastertokentable 
 if (admin) {
-app.all('/dumptokens', (req, res) => {
+  app.all('/dumptokens', (req, res) => {
     console.log("Inside /dumptokens");
     console.log(req.body);
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
     const authHeader = req.headers.authorization;
-    if ((authHeader != authKey) && (!disableBearer)) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
     };
 
     res.status(200).send(masterTokenTable);
     const fullDate = new Date();
     console.log(fullDate.toUTCString()+" /dumptokens API:  Endpoint call from "+ip+". Sending mastertokentable");
     expiretokens();
-});
+  });
 };
 
 //===============================================
@@ -798,7 +827,221 @@ app.all('/getuser', (req, res) => {
 
 //===============================================
 
+//===============================================
+//  Association CRUD Endpoints
+//===============================================
 
+// /addassoc endpoint.
+// 	Insert a staff/bubble association
+
+app.all('/addassoc', (req, res) => {
+    expiretokens();
+    console.log("Inside /addassoc");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    if (!req.body.staffid) {        // Require staff ID to be supplied
+        res.status(401).send({ error: 'No Staff ID' });
+        console.log("No Staff ID supplied.");
+        return;       
+    }
+    if (!req.body.bubbleid) {        // Require bubble ID to be supplied
+        res.status(401).send({ error: 'No Bubble ID' });
+        console.log("No Bubble ID supplied.");
+        return;       
+    }    
+
+    //
+    // Future Change: Validate received staffid & bubbleid before adding. Make sure they exist
+    //
+
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+    	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
+
+        var newvalues = { };
+        newvalues.associd = req.body.bubbleid+":"+req.body.staffid;
+        newvalues.bubbleid = req.body.bubbleid;
+        newvalues.staffid = req.body.staffid;
+       	dbo.collection("Associations").insertOne(newvalues, function(err, result2) {
+           	if (err) {
+                //throw err;
+                if (err.code === 11000) {
+                // Duplicate username
+                    console.log("Association already exists");
+                    return res.status(422).send({ status: "failed", message: 'Association already exists!' });
+                }
+                console.log(err);
+                  // Some other error
+                return res.status(422).send(err);                    
+            };
+			const recData = { };
+			console.log(result2);
+			recData['associd'] = newvalues.associd;
+			recData['bubbleid'] = newvalues.bubbleid;
+      		recData['staffid'] = newvalues.staffid;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['insertedId'] = result2.insertedId;
+            recData['status'] = 'Association Saved';
+			//console.log(recData);
+       		db.close();
+            res.status(200).send(recData);
+            const fullDate = new Date();
+			console.log(fullDate.toUTCString()+" /addassoc API: Endpoint call from "+ip);    
+	    });
+    });
+});
+
+// /getassoc endpoint.
+// 	Retrieve a staff/bubble association
+app.all('/getassoc', (req, res) => {
+    expiretokens();
+    console.log("Inside /getassoc");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    if (req.body.staffid) {        // Require staff ID to be supplied
+        var staffid = req.body.staffid
+    } else {
+        var bubbleid = '';
+    }
+    if (req.body.bubbleid) {        // Require bubble ID to be supplied
+        var bubbleid = req.body.bubbleid
+    } else {
+        var bubbleid = '';
+    }   
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+       	var query = { };
+        // Will load each parameter received. If none, then the query string will be empty returning all.
+		if (staffid) { query['staffid'] = staffid; };
+        if (bubbleid) { query['bubbleid'] = bubbleid; };        
+	    console.log("Query String: "+query);
+        console.log(query);
+        dbo.collection("Associations").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            //console.log("Monogo data");
+            //console.log(result);
+            recData = result;
+            db.close();
+            //console.log("Final Return");
+            //console.log(recData);
+	        //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	        //res.setHeader('Access-Control-Allow-Methods', '*');
+            res.status(200).send(recData);
+            const fullDate = new Date();
+	        console.log(fullDate.toUTCString()+" /getassoc API:  Endpoint call from "+ip);
+        });
+    });
+});
+
+
+
+// /delassoc endpoint.
+// 	Delete a staff/bubble association
+
+app.all('/delassoc', (req, res) => {
+    console.log("Inside /delassoc");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+    const authHeader = req.headers.authorization;
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
+
+    // Make sure we have been supplied staffid & bubbleid
+    if (req.body.staffid) {        // Require staff ID to be supplied
+        var staffid = req.body.staffid;
+    } else {
+        res.status(401).send({ error: 'No Staff ID supplied.'} );
+        console.log("Error: No Staff ID supplied.");
+        return;
+    }
+    if (req.body.bubbleid) {        // Require bubble ID to be supplied
+        var bubbleid = req.body.bubbleid;
+    } else {
+        res.status(401).send( { error: 'No Bubble ID supplied.'} );
+        console.log("Error: No Bubble ID supplied.");
+        return;
+    }   
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    //var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        // Will load each parameter received. If none, then the query string will be empty returning all.
+        var query = { };
+        query['associd'] = staffid+":"+bubbleid;
+	    console.log("Query String: "+query);
+        console.log(query);
+
+        //console.log("Query String: "+query);
+        //console.log(query);
+        dbo.collection("Associations").deleteOne(query, function(err, result2) {
+		    //console.log(result2);
+            const recData = { associd: 0, acknowledged: "", deletedCount: 0 };
+            //console.log(newvalues.eventID);
+            recData['associd'] = query.associd;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['deletedCount'] = result2.deletedCount;
+		    res.status(200).send(recData);
+            const fullDate = new Date();
+		    console.log(fullDate.toUTCString()+" /delassoc API:  Endpoint call from "+ip+".");
+		    console.log(recData);
+	    });
+    });
+});
+
+//===============================================
+
+//===============================================
+//  Bubble CRUD Endpoints
+//===============================================
+
+// /??? endpoint.
+// 	Some more info
+
+
+//===============================================
 
 if (!disableHTTPS) {
     var server = https.createServer(options, app);      // Create HTTPS server
