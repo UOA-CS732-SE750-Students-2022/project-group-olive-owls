@@ -3,7 +3,7 @@ import { ItemTypes } from "./ItemTypes";
 
 const style = {
     position: "absolute",
-    border: "1px dashed gray",
+    border: "1px solid black",
     backgroundColor: "white",
     padding: "0.5rem 1rem",
     cursor: "move",

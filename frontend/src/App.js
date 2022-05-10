@@ -18,6 +18,7 @@ import {
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/Records'
+import HomePage from "./pages/HomePage";
 
 function App() {
     return (
@@ -25,11 +26,8 @@ function App() {
             <DndProvider backend={HTML5Backend}>
                 <Router>
                     <Routes>
-                        <Route path="/login" element={<SignIn />}>
-                        </Route>
-                        <Route path="/" element={<Root />}>
-
-                        </Route>
+                        <Route path="/login" element={<SignIn />}/>
+                        <Route path="/" element={<Root />}/>
                         <Route path="/register" element={<Register />}>
 
                         </Route>
@@ -37,6 +35,7 @@ function App() {
                         <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
                         <Route path="/records" element={<Records />}/>
+                        <Route path="/home" element={<HomePage/>}/>
                     </Routes>
 
                 </Router>
