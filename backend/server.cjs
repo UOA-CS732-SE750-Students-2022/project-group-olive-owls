@@ -12,6 +12,10 @@
 //   Desc: Added endpoints for CRUD operations on the Events table.
 //
 
+//   Date: 10/5/2022                            Guanxiang Zhao (gzha644)
+//   Desc: Added endpoints for Bubbles.
+//
+
 
 const express = require('express');
 const https = require('https');
@@ -364,6 +368,215 @@ app.all('/updevent', (req, res) => {
         });
     });
 });
+
+
+//===============================================
+//  Bubble Endpoints
+//===============================================
+
+//get bubble by bubbleid
+app.get('/getbubble', (req, res) => {
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    console.log("Inside /getbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // get bubble id
+    var bubbleid = req.query.bubbleID;
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        if (typeof bubbleid === "undefined") {
+            var query = {};
+        } else	{
+            var query = { bubbleID : 0 };
+            query['bubbleID'] = parseInt(bubbleid);
+        }
+
+        dbo.collection("Bubbles").find(query).toArray(function(err, result) {
+            if (err) throw err;
+            recData = result;
+            db.close();
+            res.setHeader('Access-Control-Allow-Methods', '*');
+            res.status(200).send(recData);
+            console.log(fullDate.toUTCString()+" /getbubble API:  Endpoint call from "+ip);
+        });
+    });
+});
+
+
+
+// Addbubble endpoingt
+// Create a record to Bubble database
+app.all('/addbubble', (req, res) => {
+    console.log("Inside /addbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        dbo.collection("Bubbles").find({}).sort({"bubbleID" : -1}).limit(1).toArray(function(err, result1) {
+            if (err) throw err;
+            const nextID = result1[0].bubbleID + 1;
+            //create a new bubble record
+            var newvalues = { bubbleID: 0,  bubbleName: "", Active: ""};
+            newvalues['bubbleID'] = nextID;
+            newvalues['bubbleName'] = req.body.bubbleName;
+            newvalues['Active'] =  req.body.Active;
+
+            //insert to database
+            dbo.collection("Bubbles").insertOne(newvalues, function(err, result2) {
+                if (err) throw err;
+                const recData = { bubbleID: 0, acknowledged: "", insertedId:"" };
+
+                recData['bubbleID'] = newvalues.bubbleID;
+                recData['acknowledged'] = result2.acknowledged;
+                recData['insertedId'] = result2.insertedId;
+
+                db.close();
+                res.status(200).send(recData);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /addevent API: New bubbleID: "+newvalues.bubbleID+"  Endpoint call from "+ip);
+            });
+            });
+    });
+});
+
+
+//Uptdate bubble endpoint
+
+app.all('/updbubble', (req, res) => {
+    console.log("Inside /updbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+    
+    // Get the bubble id which want to update
+    var bubbleid = req.query.bubbleID;
+    
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        if (typeof bubbleid === "undefined") {
+            console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No BubbleID specified. Exiting.");
+            res.status(400).send( { error: "No Bubble ID supplied" } );
+            return;
+        } else  {
+                var query = { bubbleID : 0 };
+                query['bubbleID'] = parseInt(bubbleid);
+        }
+
+	    console.log(req.body);
+
+        dbo.collection("Bubbles").updateOne(query, { $set: req.body } , function(_err, result2) {
+
+            const recData = { bubbleID: 0};
+
+            recData['bubbleID'] = query.bubbleID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['matchedCount'] = result2.matchedCount;
+            recData['modifiedCount'] = result2.modifiedCount;
+            recData['upsertedCount'] = result2.upsertedCount;
+            res.status(200).send(recData);
+            const fullDate = new Date();
+            console.log(fullDate.toUTCString()+" /updbubble API:  Endpoint call from "+ip+".");
+            console.log(recData);
+        });
+    });
+});
+
+
+//Delet bubble by id endpoint
+app.get('/delbubble', (req, res) => {
+    console.log("Inside /delbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // Get bubbleid which want to delet
+    var bubbleid = req.query.bubbleID;
+    
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        if (typeof bubbleid === "undefined") {
+		    console.log(fullDate.toUTCString()+" /delbubble API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
+		    res.status(400).send( { error: "No Bubble ID supplied" } );
+		    return;
+        } else  {
+            var query = { bubbleID : 0 };
+            query['bubbleID'] = parseInt(bubbleid);
+        }
+
+        dbo.collection("Bubbles").deleteOne(query, function(_err, result2) {
+
+            const recData = { bubbleID: 0, acknowledged: "", deletedCount: 0 };
+
+            recData['bubbleID'] = query.eventID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['deletedCount'] = result2.deletedCount;
+		    res.status(200).send(recData);
+            const fullDate = new Date();
+		    console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
+		    console.log(recData);
+	    });
+    });
+});
+
+
 
 
 //===============================================
