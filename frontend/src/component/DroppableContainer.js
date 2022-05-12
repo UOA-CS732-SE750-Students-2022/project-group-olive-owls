@@ -3,13 +3,14 @@ import { useDrop } from "react-dnd";
 import update from "immutability-helper";
 import { ItemTypes } from "./ItemTypes";
 import {Bubble} from "./Bubble";
+import styles from "../pages/HomePage.module.css"
 
-const styles = {
-    width: 300,
-    height: 300,
-    border: "1px solid black",
-    position: "relative"
-};
+// const styles = {
+//     width: 300,
+//     height: 300,
+//     border: "1px solid black",
+//     position: "relative"
+// };
 export const DroppableContainer = ({ hideSourceOnDrag }) => {
     const [boxes, setBoxes] = useState({
         a: { top: 20, left: 80, title: "Drag me around" },
@@ -40,8 +41,25 @@ export const DroppableContainer = ({ hideSourceOnDrag }) => {
         }),
         [moveBox]
     );
+
+    let imgSrc = "MockMap.jpg"; //Should get from upload, this is mock data
+    let image = new Image();
+    image.src = imgSrc;
+
+    let backgroundImage = "url(\"" + imgSrc + "\")";
+    let imgWidth = image.width + "px";
+    let imgHeight = image.height + "px";
+
+    const backgroundImageStyle = {
+        width: `${imgWidth}`,
+        height: `${imgHeight}`,
+        backgroundImage: `${backgroundImage}`
+    };
+
+    console.log(image)
+
     return (
-        <div ref={drop} style={styles}>
+        <div ref={drop} className={styles.map} id="map" style={backgroundImageStyle}>
             {Object.keys(boxes).map((key) => {
                 const { left, top, title } = boxes[key];
                 return (

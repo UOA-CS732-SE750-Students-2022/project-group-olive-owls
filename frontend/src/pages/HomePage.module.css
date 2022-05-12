@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+.main-page {
+
+}
+
+.side-item {
+
+}
+
+.map {
+    /*background-image: url("../../public/MockMap.jpg");*/
+    border: 1px solid black;
+    position: relative;
+    /*width: fit-content;*/
+    /*height: fit-content;*/
+    /*background-image: url("../../public/MockMap.jpg");*/
+}

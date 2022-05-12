@@ -1,6 +1,7 @@
 import Menubar from "../component/Menubar";
-import styles from "./HomePage.css"
+import styles from "./HomePage.module.css"
 import SideBar from "../component/Sidebar";
+import {DroppableContainer} from "../component/DroppableContainer";
 
 export default function HomePage() {
     return (
@@ -12,9 +13,7 @@ export default function HomePage() {
                 <div className={styles.sideItem}>
                     <SideBar/>
                 </div>
-                <div className={styles.mainPage}>
-
-                </div>
+                <DroppableContainer/>
 
 
             </div>

@@ -7,7 +7,8 @@ const style = {
     backgroundColor: "white",
     padding: "0.5rem 1rem",
     cursor: "move",
-    width: "max-content"
+    width: "max-content",
+    borderRadius: "50px"
 };
 const role = "Box";
 export const Bubble = ({ id, left, top, hideSourceOnDrag, children }) => {
