@@ -4,10 +4,28 @@
 These are base setup notes. Not all commands may be required. (Depends on your global installs) <br/>
 
 #
+Install Node.js <br/>
+**https://nodejs.org/en/download/** </br>
+<br/>
 **npm install --save express** <br/>
+ <br/>
+Install yarn <br/>
+**npm install yarn** <br/>
+ <br/>
+Note: If you receive the following error  <br/>
+<br/>
+"yarn : File C:\Users\sschm\AppData\Roaming\npm\yarn.ps1 cannot be loaded because running <br/>
+scripts is disabled on this system. For more information, see about_Execution_Policies at <br/>
+https:/go.microsoft.com/fwlink/?LinkID=135170." <br/>
+<br/>
+You need to change the execution policy. <br/>
+Run **powershell as administrator.** and execute the following command. <br/>
+**Set-ExecutionPolicy -ExecutionPolicy RemoteSigned** <br/>
+ <br/>
+Install router-dom <br/>
 **yarn add react-router-dom** <br/>
 <br/>
-- Required modules, need to be installed <br/>
+- Required modules that need to be installed <br/>
 **"yarn add esm"** <br/>
 **"yarn add axios"** <br/>
 **"npm install cors"** <br/>
@@ -27,9 +45,9 @@ or <br/>
 
 #  Processing Control Switches
 
-- **3 control switches** have been created that allow switching of security fuctions on or off. These are booleans located at the begining of the code. <br/>
+- **3 control switches** have been created within code that allow switching of security fuctions on or off. These booleans are located at the top of the code. <br/>
   - **"disableHTTPS": Default: true.** Controls weather HTTPS or HTTP is to be used when accepting connections<br/>
-    (Primarily for use when runningoff localhost or just dont want encryption.)<br/>
+    (Primarily for use when running off localhost or just dont want encryption.)<br/>
   - **"disableBEARER": Default: true.** which allows bearer authentication to be switched on or off at the start of execution.<br/>
     (A second form of authenticaiton is used in the code for the Events processing. This was before the Token auth was setup.)<br/>
   - **"admin": Default: true.** which allows admin endpoints switched on or off in code. (useful for debugging)<br/>
