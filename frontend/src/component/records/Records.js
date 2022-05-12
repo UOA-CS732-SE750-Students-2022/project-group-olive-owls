@@ -1,9 +1,9 @@
 //Author - Syed Kazmi
 import * as React from 'react';
-import RecordsTable from '../component/RecordsTable';
-import TableMenuBar from '../component/TableMenubar';
+import RecordsTable from './RecordsTable';
+import TableMenuBar from './TableMenubar';
 import { Container } from '@mui/material';
-import useGet from '../component/useGet';
+import useGet from '../useGet';
 
 function Records() {
   const[reRender, setreRender]=React.useState(false);

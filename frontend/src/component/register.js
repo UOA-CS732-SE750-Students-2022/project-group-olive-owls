@@ -12,7 +12,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-
+//Register page so employees can be gain permission to use the webapp
 export default function Register() {
   const handleSubmit = (event) => {
     event.preventDefault();

@@ -7,7 +7,7 @@ import {
 
 import Container from '@mui/material/Container';
 
-
+//Front page of the application, displays a container with links to the signin and register pages
 export default function SignIn() {
 
 
