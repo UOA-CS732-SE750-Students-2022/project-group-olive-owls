@@ -1,67 +1,86 @@
 
-# Install Notes:
+# Backend: Install Notes
 
-These are some base setup notes. 
-Not all may be required. 
-** Depends on your global installs
-# 
-**npm install --save express
-**yarn add react-router-dom
+These are base setup notes. Not all commands may be required. (Depends on your global installs) <br/>
 
-- Required modules, need to be installed
-"yarn add esm"
-"yarn add axios"
-"npm install cors"
+#
+**npm install --save express** <br/>
+**yarn add react-router-dom** <br/>
+<br/>
+- Required modules, need to be installed <br/>
+**"yarn add esm"** <br/>
+**"yarn add axios"** <br/>
+**"npm install cors"** <br/>
+<br/>
+- MongoDB library <br/>
+**"yarn add mongodb"** or ... **"npm install mongodb"** <br/>
+<br/>
+- Nodaemon. Good for server testing. (Daemon does not fork to background and automatically restarts on save)<br/>
+**"yarn global add nodemon"** or **"npm install -g nodemon"** <br/>
+<br/>
+- Starting server up
+**"node server.cjs"**
 
-- MongoDB library
-"yarn add mongodb"
-or ...
-"npm install mongodb"
+#  Processing Control Switches
 
-- Nodaemon. Good for server testing. 
-  Daemon does not fork to background and automatically restarts on save
-"yarn global add nodemon"
-or ...
-"npm install -g nodemon"
+- **3 control switches** have been created that allow switching of security fuctions on or off. These are booleans located at the begining of the code. <br/>
+  - **"disableHTTPS": Default: true.** Controls weather HTTPS or HTTP is to be used when accepting connections<br/>
+    (Primarily for use when runningoff localhost or just dont want encryption.)<br/>
+  - **"disableBEARER": Default: true.** which allows bearer authentication to be switched on or off at the start of execution.<br/>
+    (A second form of authenticaiton is used in the code for the Events processing. This was before the Token auth was setup.)<br/>
+  - **"admin": Default: true.** which allows admin endpoints switched on or off in code. (useful for debugging)<br/>
+    (Just makes life a bit easier when you can dump the whole Token auth table.)<br/>
 
+#  MongoDB connectivity 
 
-#  Notes:
+- A varible has been setup called **"MongoDBConnString"** located at the top of the code. <br/>
+  - Set this to the connection string of your desired MongoDB server. (Either a local server, remote server or SaaS service.)<br/>
+  - It currently is set to the default test DB for OliveOwls located on the MongoDB Atlas SaaS service.<br/>
+- As insert requests are made from the frontend system, if a table/collection doesn't exist, it will automatically create it <br/>
+  (Also an index of the associated ID is created to ensure unique ID's.<br/>
 
-9/4/2022 10:26am
-Initial setup of backend directory on github:project-group-olive-owl
+#  Listening Port 
 
-- Copied server.js over from my dev directories
-	- Initial dev based off lab examples
-- updated .gitignore
-- Setup my backend dev to work out of the backend directory of repo rather than my local development environment.
-- installed express
-- Installed libraries
-	- esm
-	- axios
-- Initial code cleanup
-- Ran devstart test environment before commit
+- A varible called **"port"** is located at the top of the code. <br/>
+  - This is the port the server will setup and listen on.<br/>
+  - Set this to the port number your require the server to listen on. It is currently defaulted to port **8010**<br/>
 
-#       Modification history
+#  Notes/Modifications:
 
-26/4/2022					S. Schmidt
-Desc: 
- Made changes to server.js to include handling encrypted connections as well as some basic authentication. 
-Had to move server.js to server.cjs extention to handle the "require" function correctly for https libraries.
-** Still a bit more to add here **
+9/4/2022 10:26am<br/>
+Initial setup of backend directory on github:project-group-olive-owl<br/>
+<br/>
+- Copied server.js over from my dev directories<br/>
+	- Initial dev based off lab examples<br/>
+- updated .gitignore<br/>
+- Setup my backend dev to work out of the backend directory of repo rather than my local development environment.<br/>
+- installed express<br/>
+- Installed libraries<br/>
+	- esm<br/>
+	- axios<br/>
+- Initial code cleanup<br/>
+- Ran devstart test environment before commit<br/>
+- Created BackendUpdates branch<br/>
+<br/>
+26/4/2022	  S.Schmidt<br/>
+- Made changes to server.js to include handling encrypted connections as well as some basic authentication. <br/>
+- Moved from server.js to server.cjs extention (common JS) to handle the "require" function correctly for https libraries.<br/>
+- Started planning the layout of the program. <br/>
+- Created a couple of test endpoints to get the overall base functionlity running.<br/>
+<br/>
+29/04/2022	  S.Schmidt<br/>
+Desc: Added endpoints for CRUD operations on the Events table.<br/>
+<br/>
+3/5/2022	  S.Schmidt<br/>
+- Added 3 control switchs<br/>
+  - "disableHTTPS" which allows HTTPS to be switched on or off in code.<br/>
+    (Primarily for use when runningoff localhost or just dont want encryption.)<br/>
+  - "disableBEARER" which allows bearer authentication to be switched on or off in code.<br/>
+    (A second form of authenticaiton is used in the code for the Events processing. This was before the Token auth was setup.)<br/>
+  - "admin" which allows admin endpoints switched on or off in code. (useful for debugging)<br/>
+    (Just makes life a bit easier when you can auth the Token auth table.)<br/>
+  - Added endpoints for User access control. <br/>
+    - User Token Authentication processing<br/>
+    - CRUD funtions against user authentication table entries<br/>
+    - STILL TODO: Authenticaton logging<br/>
 
-29/04/2022					S. Schmidt
-Desc: Added endpoints for CRUD functions on the Events table.
-
-Date: 3/5/2022                             S. Schmidt
-Desc: 
-    - Added 3 control switchs
-      # "disableHTTPS" which allows HTTPS to be switched on or off in code.
-        (Primarily for use when runningoff localhost or just dont want encryption.)
-      # "disableBEARER" which allows bearer authentication to be switched on or off in code.
-        (A second form of authenticaiton is used in the code for the Events processing. This was before the Token auth was setup.)
-      # "admin" which allows admin endpoints switched on or off in code. (useful for debugging)
-        (Just makes life a bit easier when you can auth the Token auth table.)
-    - Added endpoints for User access control. 
-      # User Token Authentication processing
-      # CRUD funtions against user authentication table entries
-      # STILL TODO: Authenticaton logging

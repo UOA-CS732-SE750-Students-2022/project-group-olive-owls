@@ -138,6 +138,7 @@ const disableBearer = true;     // Disable Bearer Auth for dev mode. Change to t
 const admin = true;             // Admin processing functions available like dumpmastertokens endpoint for debugging
 const port = 8010;              // Port number to open server on 
 
+// MongoDB connecttivity
 var MongoDBConnString = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
 
 console.info("Inside server.js   Start: "+date.getTime);
