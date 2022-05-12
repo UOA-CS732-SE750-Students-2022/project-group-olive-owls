@@ -13,13 +13,17 @@ These are base setup notes. Not all commands may be required. (Depends on your g
 **"npm install cors"** <br/>
 <br/>
 - MongoDB library <br/>
-**"yarn add mongodb"** or ... **"npm install mongodb"** <br/>
+**"yarn add mongodb"** <br/>
+or ... <br/>
+**"npm install mongodb"** <br/>
 <br/>
 - Nodaemon. Good for server testing. (Daemon does not fork to background and automatically restarts on save)<br/>
-**"yarn global add nodemon"** or **"npm install -g nodemon"** <br/>
+**"yarn global add nodemon"** <br/>
+or <br/>
+**"npm install -g nodemon"** <br/>
 <br/>
-- Starting server up
-**"node server.cjs"**
+- Starting server up <br/>
+**"node server.cjs"** <br/>
 
 #  Processing Control Switches
 
@@ -63,15 +67,17 @@ Initial setup of backend directory on github:project-group-olive-owl<br/>
 - Created BackendUpdates branch<br/>
 <br/>
 26/4/2022	  S.Schmidt<br/>
+<br/>
 - Made changes to server.js to include handling encrypted connections as well as some basic authentication. <br/>
 - Moved from server.js to server.cjs extention (common JS) to handle the "require" function correctly for https libraries.<br/>
 - Started planning the layout of the program. <br/>
 - Created a couple of test endpoints to get the overall base functionlity running.<br/>
 <br/>
 29/04/2022	  S.Schmidt<br/>
-Desc: Added endpoints for CRUD operations on the Events table.<br/>
+Added endpoints for CRUD operations on the Events table.<br/>
 <br/>
 3/5/2022	  S.Schmidt<br/>
+<br/>
 - Added 3 control switchs<br/>
   - "disableHTTPS" which allows HTTPS to be switched on or off in code.<br/>
     (Primarily for use when runningoff localhost or just dont want encryption.)<br/>
@@ -83,4 +89,3 @@ Desc: Added endpoints for CRUD operations on the Events table.<br/>
     - User Token Authentication processing<br/>
     - CRUD funtions against user authentication table entries<br/>
     - STILL TODO: Authenticaton logging<br/>
-
