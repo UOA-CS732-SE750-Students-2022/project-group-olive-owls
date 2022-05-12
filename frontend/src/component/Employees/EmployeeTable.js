@@ -7,10 +7,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import LoadingGif from '../Images/loading.gif';
+import LoadingGif from '../../Images/loading.gif';
 import { Container } from '@mui/material';
 
-export default function RecordsTable({data, loading}) {
+export default function EmployeeRecords({data, loading}) {
   const recordsData = data;
   const recordLoading = loading;
  
@@ -24,11 +24,11 @@ export default function RecordsTable({data, loading}) {
         <TableHead>
           <TableRow>
             <TableCell>Unique ID</TableCell>
-            <TableCell align="right">Event ID</TableCell>
-            <TableCell align="right">Event Name&nbsp;</TableCell>
+            <TableCell align="right">Employee ID</TableCell>
+            <TableCell align="right">Employee name&nbsp;</TableCell>
             <TableCell align="right">Description&nbsp;</TableCell>
             <TableCell align="right">Location&nbsp;</TableCell>
-            <TableCell>Date and Time</TableCell>
+            <TableCell>Join date</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

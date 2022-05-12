@@ -26,7 +26,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-
+//Register page so employees can be gain permission to use the webapp
 export default function Register() {
   let navigate = useNavigate();
   const [openSuccess, setOpenSuccess] = React.useState(false);

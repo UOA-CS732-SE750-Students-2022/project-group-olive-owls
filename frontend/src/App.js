@@ -15,8 +15,9 @@ import Alert from './component/Alert';
 import Root from './component/root';
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
-import Records from './component/Records'
+import Records from './component/records/Records'
 import BubbleEdit from "./component/BubbleEdit";
+import EmployeeRecords from "./component/Employees/EmployeeRecords";
 
 import PrivateRoute from './component/privateRoute';
 function App() {
