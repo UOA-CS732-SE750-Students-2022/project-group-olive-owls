@@ -11,6 +11,9 @@
 # production
 /build
 
+# retiredCode
+/retiredCode
+
 # misc
 .DS_Store
 .env.local
