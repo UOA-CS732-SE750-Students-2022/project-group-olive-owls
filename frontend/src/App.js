@@ -18,7 +18,7 @@ import {
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/Records'
-
+import PrivateRoute from './component/privateRoute';
 function App() {
     return (
         <div className="App">
@@ -36,7 +36,7 @@ function App() {
                         <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
-                        <Route path="/records" element={<Records />}/>
+                        <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute> }/>
                     </Routes>
 
                 </Router>
