@@ -4,6 +4,7 @@
 //      It will handle all backend processing requests for the COVID app
 //   which is being designed for the group project submission for CS732/SE750.
 //
+
 //      There are 3 control switches that control activation of features in the server backend.
 //          # "disableHTTPS" which allows HTTPS to be switched on or off in code.                           Default: true
 //          # "disableBEARER" which allows bearer authentication to be switched on or off in code.          Default: true
@@ -13,6 +14,7 @@
 //   Modification History
 // ##################################
 //
+
 //   Date: 20/4/2022                            S. Schmidt
 //   Desc: Made changes to include handling encrypted connections as well as some basic authentication.
 // 	Move server.js to server.cjs (common JS format) to handle the "require" function correctly for MongoDB client libraries.
@@ -118,7 +120,7 @@ const https = require('https');
 const http  = require('http');
 const fs = require('fs');
 const cors = require('cors');
-
+const port = 8010;
 const axios = require('axios');
 const path = require('path');
 const { Console } = require("console");
@@ -158,6 +160,7 @@ app = express();
 app.use(cors());
 
 app.use(express.json())
+
 
 // 
 // Defined Enpoints
@@ -236,6 +239,15 @@ app.get('/queryname', (req, res) => {
         });
 
     });
+
+    //res.json({
+    //    Endpoint: '/api',
+    //    name: req.query.name,
+    //    ip: ip
+    //});
+
+    //res.json({ recData });
+
 });
 
 
@@ -284,9 +296,46 @@ app.get('/mongoquery', (req, res) => {
 //  Events Endpoints
 //===============================================
 
+app.all('/verifytoken', (req, res) => {
+    expiretokens();
+    console.log("Inside /verifytoken");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    if (!req.body.authtoken) {        // Require valid auth token to be supplied
+        res.status(401).send({ msg: 'Invalid auth token supplied', validtoken: false });
+        console.log("Authentication Error!!! No token supplied.");
+        return;       
+    }
+
+    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
+    console.log("Built token query string: "+tokenquerystring)
+
+    var searchresult = searchtokens(tokenquerystring);
+    //console.log(searchresult);
+    if (!searchresult) {
+        res.status(401).send({ msg: 'No Auth token or Expired Auth token', validtoken: false });
+        console.log("Authentication Error!!! No valid token in master table.");
+        return;        
+    };
+
+    console.log("Found valid token in master table. token: "+req.body.authtoken+"   Expires: "+searchresult.tokenElement.expiredatetime);
+    var responsertn = { };
+    responsertn.msg = 'Token Valid';
+    responsertn.expiredatetime = '';
+    const expiredatetime = searchresult.tokenElement.expiredatetime;
+    responsertn.expiredatetime = expiredatetime;
+    responsertn.validtoken = true;
+    res.status(200).send(responsertn);    
+    console.log(fullDate.toUTCString()+" /verifytoken API:  Endpoint call from "+ip+". Result sent: "+responsertn);
+    //console.log(searchresult);
+});
 // /getevent endpoint.
 // 	Retrieve all events or event specified by eventID
+//app.use(cors());
 app.get('/getevent', (req, res) => {
+    res.setHeader('Access-Control-Allow-Methods', '*');
     console.log("Inside /getevent");
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
@@ -506,6 +555,73 @@ app.all('/updevent', (req, res) => {
     });
 });
 
+
+
+
+
+//===============================================
+//Auth  Stuff
+masterTokenTable = [];
+function generateRandom(len) {
+    var crypto = require("crypto");
+    return crypto.randomBytes(len).toString('hex');
+}
+
+// Expire tokens.
+function expiretokens() {
+    console.log("Inside expiretokens funciton");
+    arraysize = Object.keys(masterTokenTable).length
+    allexpired = true;                  // Default to true. If there are active tokens this will be set to true in the loop
+    if (arraysize > 0) {
+        const dd = {};
+        //console.log(masterTokenTable);
+        var iterationCounter = 1;
+        for (var token in masterTokenTable) {
+            dd[token] = masterTokenTable[token];
+            console.log(dd[token].tokenElement.tokenkey);
+            console.log(dd[token].tokenElement.expires);
+            console.log(dd[token].tokenElement.expired);
+            currenttimestamp = Math.floor(Date.now() / 1000);
+            expiretimestamp = dd[token].tokenElement.expires;
+            if ((currenttimestamp > expiretimestamp) && (!dd[token].tokenElement.expired)) {                   // Timestamp has expired. Mark token as expired.
+                dd[token].tokenElement.expired = true;
+                masterTokenTable[token].tokenElement.tokenkey = true;
+                console.log(masterTokenTable[token].tokenElement.tokenkey + " has expired.");
+            }
+            if (!dd[token].tokenElement.expired) {   // We still have active tokens. don't clear object
+                allexpired = false;
+            }
+            iterationCounter = iterationCounter + 1;
+        }
+        if (allexpired) {                 // All tokens have expired. clear tracking object
+            masterTokenTable = [];
+        }
+    }
+}
+
+// Expire tokens.
+function searchtokens(searchstring) {
+    console.log("Inside searchtokens function");
+    arraysize = Object.keys(masterTokenTable).length
+    allexpired = true;                  // Default to true. If there are active tokens this will be set to true in the loop
+    if (arraysize > 0) {
+        const dd = {};
+        //console.log(masterTokenTable);
+        var iterationCounter = 1;
+        for (var token in masterTokenTable) {
+            dd[token] = masterTokenTable[token];
+            if (!dd[token].tokenElement.expired) {
+                if (dd[token].tokenElement.tokenkey === searchstring) {
+                    console.log("String found");
+                    return dd[token];
+                }
+            }
+            iterationCounter = iterationCounter + 1;
+        }
+        return false;
+    }
+}
+
 //===============================================
 
 //===============================================
@@ -514,26 +630,25 @@ app.all('/updevent', (req, res) => {
 
 // /dumptokens endpoint.
 // 	dumps the mastertokentable 
+const admin = true; 
 if (admin) {
-  app.all('/dumptokens', (req, res) => {
-    console.log("Inside /dumptokens");
-    console.log(req.body);
-    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    ip = ip.replace('::ffff:', '');
-    const authHeader = req.headers.authorization;
-    if (!disableBearer) {
-        if (authHeader != authKey) {
-            res.status(401).send({ error: 'Authentication Error.'} );
-            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+    app.all('/dumptokens', (req, res) => {
+        console.log("Inside /dumptokens");
+        console.log(req.body);
+        var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+        ip = ip.replace('::ffff:', '');
+        const authHeader = req.headers.authorization;
+        if ((authHeader != authKey) && (!disableBearer)) {
+            res.status(401).send('Authentication Error.');
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: " + authHeader);
             return;
-        }
-    };
+        };
 
-    res.status(200).send(masterTokenTable);
-    const fullDate = new Date();
-    console.log(fullDate.toUTCString()+" /dumptokens API:  Endpoint call from "+ip+". Sending mastertokentable");
-    expiretokens();
-  });
+        res.status(200).send(masterTokenTable);
+        const fullDate = new Date();
+        console.log(fullDate.toUTCString() + " /dumptokens API:  Endpoint call from " + ip + ". Sending mastertokentable");
+        expiretokens();
+    });
 };
 
 //===============================================
@@ -746,6 +861,7 @@ app.all('/upduser', (req, res) => {
     tokenquerystring = req.body.authtoken+":"+ip;       // Build lookup string
     console.log("Built token query string: "+tokenquerystring)
 
+
     var searchresult = searchtokens(tokenquerystring);
     console.log(searchresult);
     if (!searchresult) {
@@ -895,6 +1011,34 @@ app.all('/addassoc', (req, res) => {
     var url = MongoDBConnString;
     //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
 
+  
+//===============================================
+//  Bubble Endpoints
+//===============================================
+
+//get bubble by bubbleid
+app.get('/getbubble', (req, res) => {
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    console.log("Inside /getbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // get bubble id
+    var bubbleid = req.query.bubbleID;
+  
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
 
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
@@ -992,7 +1136,6 @@ app.all('/getassoc', (req, res) => {
         });
     });
 });
-
 
 
 // /delassoc endpoint.
@@ -1234,6 +1377,94 @@ app.all('/updstaff', (req, res) => {
                 var query = { };
                 query["staffID"] = parseInt(staffID);
         }
+      
+// Addbubble endpoingt
+// Create a record to Bubble database
+app.all('/addbubble', (req, res) => {
+    console.log("Inside /addbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        dbo.collection("Bubbles").find({}).sort({"bubbleID" : -1}).limit(1).toArray(function(err, result1) {
+            if (err) throw err;
+            const nextID = result1[0].bubbleID + 1;
+            //create a new bubble record
+            var newvalues = { bubbleID: 0,  bubbleName: "", Active: ""};
+            newvalues['bubbleID'] = nextID;
+            newvalues['bubbleName'] = req.body.bubbleName;
+            newvalues['Active'] =  req.body.Active;
+
+            //insert to database
+            dbo.collection("Bubbles").insertOne(newvalues, function(err, result2) {
+                if (err) throw err;
+                const recData = { bubbleID: 0, acknowledged: "", insertedId:"" };
+
+                recData['bubbleID'] = newvalues.bubbleID;
+                recData['acknowledged'] = result2.acknowledged;
+                recData['insertedId'] = result2.insertedId;
+
+                db.close();
+                res.status(200).send(recData);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /addevent API: New bubbleID: "+newvalues.bubbleID+"  Endpoint call from "+ip);
+            });
+        });
+    });
+});
+
+
+//Uptdate bubble endpoint
+
+app.all('/updbubble', (req, res) => {
+    console.log("Inside /updbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+    
+    // Get the bubble id which want to update
+    var bubbleid = req.query.bubbleID;
+    
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        if (typeof bubbleid === "undefined") {
+            console.log(fullDate.toUTCString()+" /getevent API:  Endpoint call from "+ip+". ERROR: No BubbleID specified. Exiting.");
+            res.status(400).send( { error: "No Bubble ID supplied" } );
+            return;
+        } else  {
+                var query = { bubbleID : 0 };
+                query['bubbleID'] = parseInt(bubbleid);
+        }
 
 	    console.log(req.body);
 
@@ -1254,9 +1485,24 @@ app.all('/updstaff', (req, res) => {
                 const fullDate = new Date();
                 console.log(fullDate.toUTCString()+" /updstaff API:  Endpoint call from "+ip+".");
                 console.log(recData);
+          
+        dbo.collection("Bubbles").updateOne(query, { $set: req.body } , function(_err, result2) {
+
+            const recData = { bubbleID: 0};
+
+            recData['bubbleID'] = query.bubbleID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['matchedCount'] = result2.matchedCount;
+            recData['modifiedCount'] = result2.modifiedCount;
+            recData['upsertedCount'] = result2.upsertedCount;
+            res.status(200).send(recData);
+            const fullDate = new Date();
+            console.log(fullDate.toUTCString()+" /updbubble API:  Endpoint call from "+ip+".");
+            console.log(recData);
         });
     });
 });
+
 
 // /deactivatestaff endpoint.
 //      Update a specified Staff record
@@ -1314,6 +1560,55 @@ app.all('/deactivatestaff', (req, res) => {
                 console.log(fullDate.toUTCString()+" /deactivatestaff API:  Endpoint call from "+ip+".");
                 console.log(recData);
         });
+
+
+//Delet bubble by id endpoint
+app.get('/delbubble', (req, res) => {
+    console.log("Inside /delbubble");
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
+
+    //Authorization
+    const authHeader = req.headers.authorization;
+    if (authHeader != authKey) {
+        res.status(401).send('Authentication Error.');
+        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+        return;
+    }
+
+    // Get bubbleid which want to delet
+    var bubbleid = req.query.bubbleID;
+    
+
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+
+        if (typeof bubbleid === "undefined") {
+		    console.log(fullDate.toUTCString()+" /delbubble API:  Endpoint call from "+ip+". ERROR: No EventID specified. Exiting.");
+		    res.status(400).send( { error: "No Bubble ID supplied" } );
+		    return;
+        } else  {
+            var query = { bubbleID : 0 };
+            query['bubbleID'] = parseInt(bubbleid);
+        }
+
+        dbo.collection("Bubbles").deleteOne(query, function(_err, result2) {
+
+            const recData = { bubbleID: 0, acknowledged: "", deletedCount: 0 };
+
+            recData['bubbleID'] = query.eventID;
+            recData['acknowledged'] = result2.acknowledged;
+            recData['deletedCount'] = result2.deletedCount;
+		    res.status(200).send(recData);
+            const fullDate = new Date();
+		    console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
+		    console.log(recData);
+	    });
     });
 });
 
@@ -1330,3 +1625,4 @@ if (!disableHTTPS) {
 server.listen(port, () => {
   console.log("server starting on port : " + port)
 });
+

@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 
 import SignIn from './component/signIn';
@@ -8,19 +7,18 @@ import Alert from './component/Alert';
 import Root from './component/root';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import Menubar from "./component/Menubar";
-import {Button} from '@mui/material';
+
 
 
 import {
     BrowserRouter as Router,
     Routes,
-    Route,
-    Link
+    Route
 } from "react-router-dom";
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
-
+import Records from './component/Records'
+import PrivateRoute from './component/privateRoute';
 function App() {
     return (
         <div className="App">
@@ -38,7 +36,7 @@ function App() {
                         <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
-
+                        <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute> }/>
                     </Routes>
 
                 </Router>
