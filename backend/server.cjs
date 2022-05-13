@@ -27,26 +27,18 @@ const authKey = "Bearer 1234567890";
 
 const fullDate = new Date();
 const date = Date.now();
-
 console.info("Inside server.js   Start: " + date.getTime);
-
-//var key = fs.readFileSync(__dirname + '/certs/privkey.pem');
-//var cert = fs.readFileSync(__dirname + '/certs/fullchain.pem');
 var options = {
-
 };
-
 app = express()
 app.use(cors());
 app.use(express.json())
-
 // 
 // Defined Enpoints
 //
 app.get('/', (req, res) => {
     res.send('Now using https..');
 });
-
 // "axiostst" async endpoint.
 //  Simple endpoint that Processes a fetch call to retrieve some information from an external source.
 app.get('/axiostst', async (req, res) => {
@@ -156,7 +148,41 @@ app.get('/mongoquery', (req, res) => {
 //===============================================
 //  Events Endpoints
 //===============================================
+app.all('/verifytoken', (req, res) => {
+    expiretokens();
+    console.log("Inside /verifytoken");
+    console.log(req.body);
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    ip = ip.replace('::ffff:', '');
 
+    if (!req.body.authtoken) {        // Require valid auth token to be supplied
+        res.status(401).send({ msg: 'Invalid auth token supplied', validtoken: false });
+        console.log("Authentication Error!!! No token supplied.");
+        return;       
+    }
+
+    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
+    console.log("Built token query string: "+tokenquerystring)
+
+    var searchresult = searchtokens(tokenquerystring);
+    //console.log(searchresult);
+    if (!searchresult) {
+        res.status(401).send({ msg: 'No Auth token or Expired Auth token', validtoken: false });
+        console.log("Authentication Error!!! No valid token in master table.");
+        return;        
+    };
+
+    console.log("Found valid token in master table. token: "+req.body.authtoken+"   Expires: "+searchresult.tokenElement.expiredatetime);
+    var responsertn = { };
+    responsertn.msg = 'Token Valid';
+    responsertn.expiredatetime = '';
+    const expiredatetime = searchresult.tokenElement.expiredatetime;
+    responsertn.expiredatetime = expiredatetime;
+    responsertn.validtoken = true;
+    res.status(200).send(responsertn);    
+    console.log(fullDate.toUTCString()+" /verifytoken API:  Endpoint call from "+ip+". Result sent: "+responsertn);
+    //console.log(searchresult);
+});
 // /getevent endpoint.
 // 	Retrieve all events or event specified by eventID
 //app.use(cors());
