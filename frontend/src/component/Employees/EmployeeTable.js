@@ -50,8 +50,6 @@ export default function EmployeeRecords({data, loading}) {
               <TableCell component="th" scope="row">
                 {row._id}
 
-
-
               </TableCell>
               <TableCell align="right">{row.staffID}</TableCell>
               <TableCell align="right">{row.firstName}</TableCell>

@@ -1123,7 +1123,6 @@ app.all('/addstaff', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-    	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
 
         dbo.collection("Staff").find({}).sort({"staffID" : -1}).limit(1).toArray(function(err, result1) {
             if (err) throw err;
@@ -1132,14 +1131,14 @@ app.all('/addstaff', (req, res) => {
             if (typeof result1[0] === "undefined") {
                 nextid = 1;
             } else {
-		        nextid = parseInt(result1[0].staffID) + 1;
+		        nextid = result1[0].staffID + 1;
             }
             //console.log("userid: "+nextid);
 		    var newvalues = { };
             newvalues['staffID'] = nextid;
 		    newvalues['firstName'] = req.body.firstName;
 		    newvalues['surname'] = req.body.surname;  // *** TODO: Use CryptoJS to create hashvalue and store hashvalue instead. All auths will be on hashvalue.
-		    newvalues['startDate'] = currentDate;
+		    newvalues['startDate'] = req.body.startDate;
             newvalues['endDate'] = '';
             newvalues['DOB'] = req.body.DOB;
             newvalues['active'] = 'Y';                  // status
@@ -1262,6 +1261,7 @@ app.all('/updstaff', (req, res) => {
                 query["staffID"] = parseInt(staffID);
         }
 
+        console.log("Here");
 	    console.log(req.body);
 
 	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };

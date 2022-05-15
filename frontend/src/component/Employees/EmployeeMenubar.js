@@ -19,7 +19,7 @@ export default function TableMenubar(props) {
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
     const [openDel, setOpenDel] = React.useState(false);
-    const [staffIDVal, setStaffID] = React.useState("");
+    const [staffIDVal, setStaffID] = React.useState(0);
     const [staffNameVal, setStaffFirstName] = React.useState("");
     const [staffLastName, setStaffLastName] = React.useState("");
     const [staffActiveVal, setStaffActive] = React.useState("Y");
@@ -31,10 +31,11 @@ export default function TableMenubar(props) {
         //console.log(staffIDVal);
         try {
           const res = await axios.post("http://localhost:8010/deactivatestaff",
-          { staffID: staffIDVal },
+          { staffID: parseInt(staffIDVal)},
              {headers: {"Authorization" : "Bearer 1234567890"},
             }
             );
+
 
           if (res.status === 200) {
             console.log("User Deleted successfully");
@@ -91,10 +92,10 @@ export default function TableMenubar(props) {
             firstName: staffNameVal,
             surname:staffLastName,
             active: staffActiveVal,
-            startDate:staffDateVal,
-            DOB:dateOfBirthVal,
+            startDate: staffDateVal,
+            DOB: dateOfBirthVal,
         } ,
-          {params: { eventid: staffIDVal },
+          {params: { staffID: staffIDVal },
           headers: {"Authorization" : "Bearer 1234567890"}}
             );
           if (res.status === 200) {
@@ -105,7 +106,7 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
-        setStaffID("");
+        setStaffID(0);
         setStaffFirstName("");
         setStaffActive("");
         setStaffDateVal("");
@@ -159,11 +160,12 @@ export default function TableMenubar(props) {
             margin="dense"
             id="Employee ID"
             value={staffIDVal}
+            pattern="[0-9]*"
             label="Employee ID"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => setStaffID(e.target.value)}
+            onChange={(e) => setStaffID(parseInt(e.target.value))}
           />
             <TextField
             autoFocus
@@ -297,21 +299,22 @@ export default function TableMenubar(props) {
       </Dialog>
 
       <Dialog open={openDel} onClose={handleCloseDel}>
-        <DialogTitle>Delete Employee</DialogTitle>
+        <DialogTitle>Deactivate Employee</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please Enter the EmployeeID of the employee you would like to delete.
+            Please Enter the EmployeeID of the employee you would like to deactivate.
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
             id="employeeID"
             value={staffIDVal}
+            pattern="[0-9]*"
             label="Employee ID"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => setStaffID(e.target.value)}
+            onChange={(e) => setStaffID(parseInt(e.target.value))}
           />
             
         </DialogContent>
