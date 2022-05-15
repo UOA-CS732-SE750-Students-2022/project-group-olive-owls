@@ -6,12 +6,6 @@ import * as React from "react";
 import TableMenuBar from "./records/TableMenubar";
 import RecordsTable from "./records/RecordsTable";
 import useGet from "./useGet";
-import TableMenuBar from "./records/TableMenubar";
-import RecordsTable from "./records/RecordsTable";
-import useGet from "./useGet";
-import TableMenuBar from "./records/TableMenubar";
-import RecordsTable from "./records/RecordsTable";
-import useGet from "./useGet";
 
 export default function BubbleEdit(prop) {
 

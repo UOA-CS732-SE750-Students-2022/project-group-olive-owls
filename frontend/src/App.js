@@ -13,15 +13,12 @@ import {
     Route
 } from "react-router-dom";
 //imports of components
-import SignIn from './component/signIn';
-import Register from './component/register';
-import Alert from './component/Alert';
-import Root from './component/root';
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/records/Records'
 import BubbleEdit from "./component/BubbleEdit";
 import EmployeeRecords from "./component/Employees/EmployeeRecords";
+import Uploadimg from "./component/Uploadimg";
 
 import PrivateRoute from './component/privateRoute';
 function App() {
