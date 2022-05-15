@@ -21,6 +21,7 @@ export default function HomePage() {
             if (res.status === 200) {
                 console.log("Got List of bubbles successfully");
                 setBubbles(res.data);
+                console.log(bubbles);
 
             } else {
                 console.log("Some error occurred");
@@ -30,6 +31,8 @@ export default function HomePage() {
         }
     };
 
+    // getBubbles()
+
     return (
         <div>
             <header>
@@ -37,7 +40,7 @@ export default function HomePage() {
             </header>
             <div className={styles.container}>
                 <div className={styles.sideItem}>
-                    <SideBar getBubbles = { getBubbles() } bubbles = { bubbles }/>
+                    <SideBar getBubbles = { getBubbles } bubbles = { bubbles }/>
                 </div>
                 <DroppableContainer boxes={ bubbles } setBoxes={ setBubbles }/>
 

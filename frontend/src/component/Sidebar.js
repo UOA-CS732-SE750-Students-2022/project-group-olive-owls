@@ -5,6 +5,7 @@ import GppMaybeIcon from '@mui/icons-material/GppMaybe';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import EventIcon from '@mui/icons-material/Event';
 import React from 'react';
+import MenuItemList from "./MenuItemList";
 
 export default function SideBar({ getBubbles, bubbles }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -66,17 +67,9 @@ export default function SideBar({ getBubbles, bubbles }) {
                anchorEl={anchorEl}
                open={open}
                onClose={handleClose}
-               onClick={getBubbles}
+               onClick={handleClose}
            >
-               <MenuItem>
-                   <BubbleChartIcon /> Bubble 1
-               </MenuItem>
-               <MenuItem>
-                   <BubbleChartIcon /> Bubble 2
-               </MenuItem>
-               <MenuItem>
-                   <BubbleChartIcon /> Bubble 3
-               </MenuItem>
+               <MenuItemList bubbles={ bubbles }/>
 
 
 

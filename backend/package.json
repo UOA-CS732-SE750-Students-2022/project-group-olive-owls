@@ -22,6 +22,5 @@
     "mongoose": "^6.2.8",
     "process": "^0.11.10",
     "react-router-dom": "^6.3.0"
-
   }
 }

@@ -51,7 +51,7 @@ export const DroppableContainer = ({ hideSourceOnDrag, boxes, setBoxes } ) => {
         backgroundImage: `${backgroundImage}`
     };
 
-    console.log(image)
+    // console.log(image)
 
     return (
         <div ref={drop} className={styles.map} id="map" style={backgroundImageStyle}>
