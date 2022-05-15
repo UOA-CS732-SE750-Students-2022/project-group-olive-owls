@@ -10,8 +10,8 @@ function EmployeeRecords() {
     const[reRender, setreRender]=React.useState(false);
 
     // Change the useGet to retrieve employee/staff data
-    const getData = useGet('http://localhost:8010/getevent',reRender);
-    const recordsData = getData.data;
+    const getData = useGet('http://localhost:8010/getstaff',reRender);
+    const employeeData = getData.data;
     const recordLoading = getData.isLoading;
     return (
         <div>
@@ -20,7 +20,7 @@ function EmployeeRecords() {
                 <Container sx={{my:4}} maxWidth="xs">
                     <EmployeeMenuBar render={reRender} setRender={setreRender}/>
                 </Container>
-                <EmployeeTable data={recordsData} loading={recordLoading}/>
+                <EmployeeTable data={employeeData} loading={recordLoading}/>
             </Container>
         </div>
     )

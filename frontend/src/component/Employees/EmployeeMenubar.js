@@ -19,21 +19,24 @@ export default function TableMenubar(props) {
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
     const [openDel, setOpenDel] = React.useState(false);
-    const [eventIDVal, seteventIDVal] = React.useState("");
-    const [eventNameVal, seteventNameVal] = React.useState("");
-    const [eventDescVal, seteventDescVal] = React.useState("");
-    const [eventLocVal, seteventLocVal] = React.useState("");
-    const [eventDateVal, seteventDateVal] = React.useState("");
+    const [staffIDVal, setStaffID] = React.useState("");
+    const [staffNameVal, setStaffFirstName] = React.useState("");
+    const [staffLastName, setStaffLastName] = React.useState("");
+    const [staffActiveVal, setStaffActive] = React.useState("Y");
+    const [staffDateVal, setStaffDateVal] = React.useState("");
+    const [dateOfBirthVal, setDateBirth] = React.useState("");
 
     const handleSubmitDel = async (e) => {
         e.preventDefault();
-        //console.log(eventIDVal);
+        //console.log(staffIDVal);
         try {
-          const res = await axios.get("http://localhost:8010/delevent", 
-          { params: { eventid: eventIDVal },
-             headers: {"Authorization" : "Bearer 1234567890"}}
+          const res = await axios.get("http://localhost:8010/deactivatestaff",
+
+          { params: { staffID: staffIDVal },
+             headers: {"Authorization" : "Bearer 1234567890"},
+            }
             );
-         
+
           if (res.status === 200) {
             console.log("User Deleted successfully");
           } else {
@@ -42,21 +45,27 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
-        seteventIDVal("");
+
+
+
+        //setStaffID("");
         handleCloseDel();
         props.setRender(!props.render);
       };
 
     const handleSubmitAdd = async (e) => {
         e.preventDefault();
-        //console.log(eventIDVal);
+        //console.log(staffIDVal);
         try {
-        const res = await axios.post("http://localhost:8010/addevent", 
+        const res = await axios.post("http://localhost:8010/addstaff",
         {  
-            eventName: eventNameVal,
-            Description: eventDescVal,
-            Location:eventLocVal,
-            dateTime:eventDateVal
+            staffID: staffIDVal,
+            firstName: staffNameVal,
+            surname:staffLastName,
+            active: staffActiveVal,
+            startDate:staffDateVal,
+            DOB:dateOfBirthVal,
+
         } ,
           {headers: {"Authorization" : "Bearer 1234567890"}}
             );
@@ -68,25 +77,25 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
-        seteventNameVal("");
-        seteventDescVal("");
-        seteventLocVal("");
-        seteventDateVal("");
+        setStaffFirstName("");
+        setStaffActive("");
+        setStaffDateVal("");
         handleCloseAdd();
         props.setRender(!props.render);
       };
     const handleSubmitEdit = async (e) => {
         e.preventDefault();
-        //console.log(eventIDVal);
+        //console.log(staffIDVal);
         try {
-        const res = await axios.post("http://localhost:8010/updevent", 
-        {  eventid: eventIDVal,
-            eventName: eventNameVal,
-            Description: eventDescVal,
-            Location:eventLocVal,
-            dateTime:eventDateVal
+        const res = await axios.post("http://localhost:8010/updstaff",
+        {  staffID: staffIDVal,
+            firstName: staffNameVal,
+            surname:staffLastName,
+            active: staffActiveVal,
+            startDate:staffDateVal,
+            DOB:dateOfBirthVal,
         } ,
-          {params: { eventid: eventIDVal },
+          {params: { eventid: staffIDVal },
           headers: {"Authorization" : "Bearer 1234567890"}}
             );
           if (res.status === 200) {
@@ -97,11 +106,10 @@ export default function TableMenubar(props) {
         } catch (err) {
           console.log(err);
         }
-        seteventIDVal("");
-        seteventNameVal("");
-        seteventDescVal("");
-        seteventLocVal("");
-        seteventDateVal("");
+        setStaffID("");
+        setStaffFirstName("");
+        setStaffActive("");
+        setStaffDateVal("");
         handleCloseEdit();
         props.setRender(!props.render);
       };
@@ -142,7 +150,7 @@ export default function TableMenubar(props) {
                 </Toolbar>
             </Container>
     <Dialog open={openEdit} onClose={handleCloseEdit}>
-        <DialogTitle>Edit Event</DialogTitle>
+        <DialogTitle>Edit Employee</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Please Enter the Employee ID and the Information you would like to add into that entry.
@@ -151,66 +159,77 @@ export default function TableMenubar(props) {
             autoFocus
             margin="dense"
             id="Employee ID"
-            value={eventIDVal}
+            value={staffIDVal}
             label="Employee ID"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => seteventIDVal(e.target.value)}
+            onChange={(e) => setStaffID(e.target.value)}
           />
             <TextField
             autoFocus
             margin="dense"
-            id="Employee name"
-            value={eventNameVal}
-            label="Employee name"
+            id="Employee first name"
+            value={staffNameVal}
+            label="Employee first name"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => seteventNameVal(e.target.value)}
+            onChange={(e) => setStaffFirstName(e.target.value)}
           />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="Extra information"
-            value={eventDescVal}
-            label="Extra information"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={(e) => seteventDescVal(e.target.value)}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="Location"
-            value={eventLocVal}
-            label="Site location"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={(e) => seteventLocVal(e.target.value)}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="dateTime"
-            value={eventDateVal}
-            label=""
-            type="datetime-local"
-            fullWidth
-            variant="standard"
-            onChange={(e) => seteventDateVal(e.target.value)}
-          />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="Employee last name"
+                value={staffLastName}
+                label="Employee last name"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setStaffLastName(e.target.value)}
+            />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="Description"
+                value={staffActiveVal}
+                label="Active"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setStaffActive(e.target.value)}
+            />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="dateTime"
+                value={staffDateVal}
+                helperText="start date"
+                type="datetime-local"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setStaffDateVal(e.target.value)}
+            />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="dateTime"
+                value={dateOfBirthVal}
+                helperText="Date of birth"
+                type="datetime-local"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setDateBirth(e.target.value)}
+            />
 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEdit}>Cancel</Button>
-          <Button onClick={handleSubmitEdit}>Edit Event</Button>
+          <Button onClick={handleSubmitEdit}>Edit Employee</Button>
         </DialogActions>
       </Dialog>
       <Dialog open={openAdd} onClose={handleCloseAdd}>
-        <DialogTitle>Add Event</DialogTitle>
+        <DialogTitle>Add Employee</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Please Enter the Information you would like to add into the new entry. 
@@ -219,56 +238,67 @@ export default function TableMenubar(props) {
             autoFocus
             margin="dense"
             id="employeeName"
-            value={eventNameVal}
+            value={staffNameVal}
             label="Employee name"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => seteventNameVal(e.target.value)}
+            onChange={(e) => setStaffFirstName(e.target.value)}
           />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="employeeLastName"
+                value={staffLastName}
+                label="Employee Last Name"
+                type="text"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setStaffLastName(e.target.value)}
+            />
           <TextField
             autoFocus
             margin="dense"
             id="Description"
-            value={eventDescVal}
-            label="Extra Information"
+            value="Y"
+            label="Active"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => seteventDescVal(e.target.value)}
+            onChange={(e) => setStaffActive(e.target.value)}
           />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="Location"
-            value={eventLocVal}
-            label="Site location"
-            type="text"
-            fullWidth
-            variant="standard"
-            onChange={(e) => seteventLocVal(e.target.value)}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="dateTime"
-            value={eventDateVal}
-            label=""
-            type="datetime-local"
-            fullWidth
-            variant="standard"
-            onChange={(e) => seteventDateVal(e.target.value)}
-          />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="dateTime"
+                value={staffDateVal}
+                helperText="start date"
+                type="datetime-local"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setStaffDateVal(e.target.value)}
+            />
+            <TextField
+                autoFocus
+                margin="dense"
+                id="dateTime"
+                value={dateOfBirthVal}
+                helperText="Date of birth"
+                type="datetime-local"
+                fullWidth
+                variant="standard"
+                onChange={(e) => setDateBirth(e.target.value)}
+            />
 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAdd}>Cancel</Button>
-          <Button onClick={handleSubmitAdd}>Add Event</Button>
+          <Button onClick={handleSubmitAdd}>Add Employee</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={openDel} onClose={handleCloseDel}>
-        <DialogTitle>Delete Event</DialogTitle>
+        <DialogTitle>Delete Employee</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Please Enter the EmployeeID of the employee you would like to delete.
@@ -277,12 +307,12 @@ export default function TableMenubar(props) {
             autoFocus
             margin="dense"
             id="employeeID"
-            value={eventIDVal}
+            value={staffIDVal}
             label="Employee ID"
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => seteventIDVal(e.target.value)}
+            onChange={(e) => setStaffID(e.target.value)}
           />
             
         </DialogContent>
