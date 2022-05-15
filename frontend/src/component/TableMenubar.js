@@ -35,7 +35,7 @@ export default function TableMenubar(props) {
             );
          
           if (res.status === 200) {
-            console.log("User Deleted successfully");
+            console.log("Record Deleted successfully");
           } else {
             console.log("Some error occured");
           }
@@ -61,7 +61,7 @@ export default function TableMenubar(props) {
           {headers: {"Authorization" : "Bearer 1234567890"}}
             );
           if (res.status === 200) {
-            console.log("User Added successfully");
+            console.log("Record Added successfully");
           } else {
             console.log("Some error occured");
           }
@@ -90,7 +90,7 @@ export default function TableMenubar(props) {
           headers: {"Authorization" : "Bearer 1234567890"}}
             );
           if (res.status === 200) {
-            console.log("User Edited successfully");
+            console.log("Record Edited successfully");
           } else {
             console.log("Some error occured");
           }
