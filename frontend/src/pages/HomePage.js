@@ -30,9 +30,6 @@ export default function HomePage() {
         }
     };
 
-    getBubbles();
-    console.log(bubbles);
-
     return (
         <div>
             <header>
@@ -40,7 +37,7 @@ export default function HomePage() {
             </header>
             <div className={styles.container}>
                 <div className={styles.sideItem}>
-                    <SideBar bubbles = { bubbles }/>
+                    <SideBar getBubbles = { getBubbles() } bubbles = { bubbles }/>
                 </div>
                 <DroppableContainer boxes={ bubbles } setBoxes={ setBubbles }/>
 
