@@ -15,7 +15,7 @@ import {
     Routes,
     Route
 } from "react-router-dom";
-import {DragAndDrop} from "./component/DragAndDrop";
+import {DragAndDrop} from "./component/Bubble/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/Records'
 import HomePage from "./pages/HomePage";

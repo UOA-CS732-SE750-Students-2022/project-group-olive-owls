@@ -1,9 +1,9 @@
 import {useCallback, useEffect, useState} from "react";
 import { useDrop } from "react-dnd";
 import update from "immutability-helper";
-import { ItemTypes } from "./ItemTypes";
+import { ItemTypes } from "../ItemTypes";
 import {Bubble} from "./Bubble";
-import styles from "../pages/HomePage.module.css"
+import styles from "../../pages/HomePage.module.css"
 
 
 export const DroppableContainer = ({ hideSourceOnDrag, bubbles, setBubbles, render, setRender } ) => {

@@ -1,7 +1,7 @@
 import Menubar from "../component/Menubar";
 import styles from "./HomePage.module.css"
 import SideBar from "../component/Sidebar";
-import {DroppableContainer} from "../component/DroppableContainer";
+import {DroppableContainer} from "../component/Bubble/DroppableContainer";
 import {useEffect, useState} from "react";
 import * as React from "react";
 import useGet from "../component/useGet";
