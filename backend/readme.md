@@ -144,3 +144,5 @@ Added endpoints for Bubbles.<br/>
 - FUTURE WORK: Encrypt cleartext user passwords with a Hash representation before storing and use that for validation.<br/>
     - Discussion/decision required around weather this extends to the frontend and all passwords are hashed before transmission or just for storing)<br/>
     - Also consider encrypting both staff and user information records before writes to protect data at rest.<br/>
+- Bubble endpoints. Handle disableBEARER switch in these endpoints. <br/>
+- Change to getbubble endpoint. If no parameter is supplied. return all enteries.<br/>

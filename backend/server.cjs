@@ -68,6 +68,8 @@
 //          FUTURE WORK: Encrypt cleartext user passwords with a Hash representation before storing and use that for validation.
 //                       - Discussion/decision required around weather this extends to the frontend and all passwords are hashed before transmission or just for storing)
 //                       - Also consider encrypting both staff and user information records before writes to protect data at rest.
+//         Bubble endpoints. Handle disableBEARER switch in these endpoints. 
+//         Change to getbubble endpoint. If no parameter is supplied. return all enteries. 
 //
 
 function generateRandom (len) {
@@ -1451,14 +1453,21 @@ app.get('/getbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // get bubble id
-    var bubbleid = req.query.bubbleID;
+    //var bubbleid = req.query.bubbleID;
+    if (req.body.bubbleID) {
+        var bubbleid = req.query.bubbleID;
+    } else {
+        var bubbleid = '';
+    }
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -1469,12 +1478,13 @@ app.get('/getbubble', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-        if (typeof bubbleid === "undefined") {
+        if (bubbleid === '') {
             var query = {};
         } else	{
             var query = { bubbleID : 0 };
             query['bubbleID'] = parseInt(bubbleid);
         }
+        console.log(query);
 
         dbo.collection("Bubbles").find(query).toArray(function(err, result) {
             if (err) throw err;
@@ -1498,11 +1508,13 @@ app.all('/addbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -1550,11 +1562,13 @@ app.all('/updbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
     
     // Get the bubble id which want to update
     var bubbleid = req.query.bubbleID;
@@ -1604,11 +1618,13 @@ app.get('/delbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // Get bubbleid which want to delet
     var bubbleid = req.query.bubbleID;
