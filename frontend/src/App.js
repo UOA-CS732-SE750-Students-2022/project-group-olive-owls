@@ -16,7 +16,8 @@ import {
 import {DragAndDrop} from "./component/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/records/Records'
-import BubbleEdit from "./component/BubbleEdit";
+import BubbleEdit from "./component/Bubble/BubbleEdit";
+import AssocEdit from './component/Assoc/AssocEdit';
 import EmployeeRecords from "./component/Employees/EmployeeRecords";
 import Uploadimg from "./component/Uploadimg";
 
@@ -33,9 +34,9 @@ function App() {
 
                         </Route>
 
-                        //adds a new route for the bubble edit
-                        <Route path={"/BubbleEdit"} element={<BubbleEdit />}></Route>
-
+                        
+                        <Route path={"/bubble"} element={<BubbleEdit />}></Route>
+                        <Route path="/associate" element={<AssocEdit />}></Route>
                         <Route path="/register" element={<Register />}>
 
                         </Route>

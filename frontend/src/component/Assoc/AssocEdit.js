@@ -3,19 +3,20 @@ import {Box} from "@mui/material";
 import {Link} from "react-router-dom";
 import Button from "@mui/material/Button";
 import * as React from "react";
-import TableMenuBar from "./records/TableMenubar";
-import RecordsTable from "./records/RecordsTable";
-import useGet from "./useGet";
+import AssocMenuBar from "../Assoc/AssocMenubar";
+import AssocTable from "../Assoc/AssocTable";
+import useGet from "../useGet";
 
-export default function BubbleEdit(prop) {
+export default function AssocEdit(prop) {
 
     //gets id from the prop passed in by parameter passing
     const {id} = prop
 
 
     const[reRender, setreRender]=React.useState(false);
-    const getData = useGet('http://localhost:8010/getevent',reRender);
+    const getData = useGet('http://localhost:8010/getassoc',reRender);
     const recordsData = getData.data;
+    console.log(recordsData);
     const recordLoading = getData.isLoading;
 
     return (
@@ -23,11 +24,11 @@ export default function BubbleEdit(prop) {
 
     <div>
         <Container sx={{mb:4}}>
-            <h1>Bubble management</h1>
+            <h1>Association Management</h1>
             <Container sx={{my:4}} maxWidth="xs">
-                <TableMenuBar render={reRender} setRender={setreRender}/>
+                <AssocMenuBar render={reRender} setRender={setreRender}/>
             </Container>
-            <RecordsTable data={recordsData} loading={recordLoading}/>
+            <AssocTable data={recordsData} loading={recordLoading}/>
         </Container>
     </div>
 
