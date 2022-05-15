@@ -5,17 +5,12 @@ import { ItemTypes } from "./ItemTypes";
 import {Bubble} from "./Bubble";
 import styles from "../pages/HomePage.module.css"
 
-// const styles = {
-//     width: 300,
-//     height: 300,
-//     border: "1px solid black",
-//     position: "relative"
-// };
-export const DroppableContainer = ({ hideSourceOnDrag }) => {
-    const [boxes, setBoxes] = useState({
-        a: { top: 20, left: 80, title: "Drag me around" },
-        b: { top: 180, left: 20, title: "Drag me too" }
-    });
+
+export const DroppableContainer = ({ hideSourceOnDrag, boxes, setBoxes } ) => {
+    // const [boxes, setBoxes] = useState({
+    //     a: { top: 20, left: 80, title: "Bubble 1" },
+    //     b: { top: 180, left: 20, title: "Bubble 2" }
+    // });
     const moveBox = useCallback(
         (id, left, top) => {
             setBoxes(
@@ -42,7 +37,7 @@ export const DroppableContainer = ({ hideSourceOnDrag }) => {
         [moveBox]
     );
 
-    let imgSrc = "MockMap.jpg"; //Should get from upload, this is mock data
+    let imgSrc = "/MockMap.jpg"; //Should get from upload, this is mock data
     let image = new Image();
     image.src = imgSrc;
 
@@ -68,7 +63,7 @@ export const DroppableContainer = ({ hideSourceOnDrag }) => {
                         id={key}
                         left={left}
                         top={top}
-                        hideSourceOnDrag={hideSourceOnDrag}
+                        hideSourceOnDrag={ true }
                     >
                         {title}
                     </Bubble>

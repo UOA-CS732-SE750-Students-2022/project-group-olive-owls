@@ -6,7 +6,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import EventIcon from '@mui/icons-material/Event';
 import React from 'react';
 
-export default function SideBar() {
+export default function SideBar({ bubbles }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -77,6 +77,9 @@ export default function SideBar() {
                <MenuItem>
                    <BubbleChartIcon /> Bubble 3
                </MenuItem>
+
+
+
            </Menu>
         </>
     );

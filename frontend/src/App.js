@@ -36,7 +36,6 @@ function App() {
                         
                         </Route>
                         <Route path="/sidebar" element={<SideBar />}/>
-                        <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
                         <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute> }/>
                         <Route path="/home" element={<HomePage/>}/>
