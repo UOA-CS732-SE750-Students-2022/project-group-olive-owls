@@ -13,7 +13,7 @@ import {
     Route
 } from "react-router-dom";
 //imports of components
-import {DragAndDrop} from "./component/DragAndDrop";
+import {DragAndDrop} from "./component/Bubble/DragAndDrop";
 import SideBar from "./component/Sidebar";
 import Records from './component/records/Records'
 import BubbleEdit from "./component/Bubble/BubbleEdit";

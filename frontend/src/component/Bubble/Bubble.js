@@ -1,5 +1,5 @@
 import { useDrag } from "react-dnd";
-import { ItemTypes } from "./ItemTypes";
+import { ItemTypes } from "../ItemTypes";
 import {Link} from "@mui/material";
 
 const style = {
