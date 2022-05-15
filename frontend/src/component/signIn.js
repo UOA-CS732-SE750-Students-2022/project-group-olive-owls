@@ -44,7 +44,7 @@ const handleCloseFail = () => {
           if (res.data.authtoken) {
             localStorage.setItem("user", JSON.stringify(res.data));
             console.log("User Signed in successfully");
-            navigate('/home');
+            navigate('/uploadimg');
           }
         } else {
           console.log("Some error occured");
