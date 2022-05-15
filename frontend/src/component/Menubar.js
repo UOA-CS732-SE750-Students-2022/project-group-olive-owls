@@ -8,12 +8,7 @@ export default function Menubar() {
         <AppBar position={"static"}>
             <Container maxWidth={"xs"}>
                 <Toolbar>
-                    <IconButton color={"inherit"} sx={{ flexGrow: 2 }}>
-                        <EditIcon />
-                    </IconButton>
-                    <IconButton color={"inherit"} sx={{ flexGrow: 2 }}>
-                        <AddIcon />
-                    </IconButton>
+
                 </Toolbar>
             </Container>
         </AppBar>

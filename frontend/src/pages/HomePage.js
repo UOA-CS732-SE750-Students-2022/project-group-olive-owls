@@ -5,6 +5,7 @@ import {DroppableContainer} from "../component/DroppableContainer";
 import {useEffect, useState} from "react";
 import * as React from "react";
 import useGet from "../component/useGet";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function HomePage() {
@@ -47,7 +48,7 @@ export default function HomePage() {
             array[index] = {};
             array[index].title = item.bubbleName;
             array[index].top = 20;
-            array[index].left = 20 + (index * 50);
+            array[index].left = 20 + (index * 75);
 
         });
 

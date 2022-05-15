@@ -7,6 +7,7 @@ import EventIcon from '@mui/icons-material/Event';
 import React from 'react';
 import MenuItemList from "./MenuItemList";
 import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from "react-router-dom";
 
 export default function SideBar({ bubbles }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -18,34 +19,36 @@ export default function SideBar({ bubbles }) {
         setAnchorEl(null);
     };
 
+    const navigate = useNavigate();
+
     return (
         <>
             <Box sx={{height: '100%', maxWidth: 360}}>
                 <nav aria-label="main mailbox folders">
                     <List>
+
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    onClick={() => navigate("/bubble")}>
+                                    <ListItemIcon>
+                                        <BubbleChartIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Bubbles" />
+                                </ListItemButton>
+                            </ListItem>
+
                         <ListItem disablePadding>
                             <ListItemButton
-                                onClick={handleClick}
-                                aria-controls={open ? 'account-menu' : undefined}
-                                aria-haspopup="true"
-                                aria-expanded={open ? 'true' : undefined}
-                            >
-                                <ListItemIcon>
-                                    <BubbleChartIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Bubbles" />
-                            </ListItemButton>
-                        </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
+                                onClick={() => navigate("/EmployeeRecords")}>
                                 <ListItemIcon>
                                     <GppMaybeIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Alerts" />
+                                <ListItemText primary="Employee Records" />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton>
+                            <ListItemButton
+                                onClick={() => navigate("/records")}>
                                 <ListItemIcon>
                                     <MenuBookIcon />
                                 </ListItemIcon>
@@ -53,36 +56,38 @@ export default function SideBar({ bubbles }) {
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
-                            <ListItemButton>
+                            <ListItemButton
+                                onClick={() => navigate("/associate")}>
                                 <ListItemIcon>
                                     <EventIcon />
                                 </ListItemIcon>
-                                <ListItemText primary="Upcoming Events" />
+                                <ListItemText primary="Associations" />
                             </ListItemButton>
                         </ListItem>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <AddIcon />
-                                </ListItemIcon>
-                                <ListItemText primary="Upload Image" />
-                            </ListItemButton>
-                        </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    onClick={() => navigate("/uploadimg")}>
+                                    <ListItemIcon>
+                                        <AddIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Upload Image" />
+                                </ListItemButton>
+                            </ListItem>
                     </List>
                 </nav>
             </Box>
-           <Menu
-               id={"bubble-list"}
-               anchorEl={anchorEl}
-               open={open}
-               onClose={handleClose}
-               onClick={handleClose}
-           >
-               <MenuItemList bubbles={ bubbles }/>
+            {/*<Menu*/}
+            {/*    id={"bubble-list"}*/}
+            {/*    anchorEl={anchorEl}*/}
+            {/*    open={open}*/}
+            {/*    onClose={handleClose}*/}
+            {/*    onClick={handleClose}*/}
+            {/*>*/}
+            {/*    <MenuItemList bubbles={ bubbles }/>*/}
 
 
 
-           </Menu>
+            {/*</Menu>*/}
         </>
     );
 }
