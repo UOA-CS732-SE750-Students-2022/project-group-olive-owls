@@ -1065,7 +1065,7 @@ app.all('/delassoc', (req, res) => {
 
         // Will load each parameter received. If none, then the query string will be empty returning all.
         var query = { };
-        query['associd'] = staffid+":"+bubbleid;
+        query['associd'] = bubbleid+":"+staffid;
 	    console.log("Query String: "+query);
         console.log(query);
 
