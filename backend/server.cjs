@@ -1362,14 +1362,21 @@ app.get('/getbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // get bubble id
-    var bubbleid = req.query.bubbleID;
+    //var bubbleid = req.query.bubbleID;
+    if (req.body.bubbleID) {
+        var bubbleid = req.query.bubbleID;
+    } else {
+        var bubbleid = '';
+    }
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -1380,12 +1387,13 @@ app.get('/getbubble', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-        if (typeof bubbleid === "undefined") {
+        if (bubbleid === '') {
             var query = {};
         } else	{
             var query = { bubbleID : 0 };
             query['bubbleID'] = parseInt(bubbleid);
         }
+        console.log(query);
 
         dbo.collection("Bubbles").find(query).toArray(function(err, result) {
             if (err) throw err;
@@ -1397,7 +1405,6 @@ app.get('/getbubble', (req, res) => {
         });
     });
 });
-
 
 
 // Addbubble endpoingt
