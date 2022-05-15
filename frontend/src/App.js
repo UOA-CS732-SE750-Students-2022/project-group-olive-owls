@@ -2,7 +2,7 @@ import './App.css';
 
 import SignIn from './component/signIn';
 import Register from './component/register';
-
+import Uploadimg from './component/Uploadimg';
 import Alert from './component/Alert';
 import Root from './component/root';
 import { DndProvider } from "react-dnd";
@@ -32,6 +32,9 @@ function App() {
                         </Route>
                         <Route path="/register" element={<Register />}>
 
+                        </Route>
+                        <Route path='/uploadimg' element={<Uploadimg />}>
+                        
                         </Route>
                         <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/dnd" element={<DragAndDrop />}/>

@@ -60,6 +60,9 @@
 //   Desc: Change MongoDB connection string to be a central varible that Bubble endpoints reference rather than a 
 //           string in the local functions. Additions to change made by gzha644.
 //
+//
+//   Date: 14/5/2022                            Guanxiang Zhao
+//   Desc: Added upload image endpoint
 
 function generateRandom (len) {
     var crypto = require("crypto");
@@ -122,6 +125,7 @@ function searchtokens (searchstring) {
 }  
 
 
+const fileUpload = require('express-fileupload');
 const express = require('express');
 const https = require('https');
 const http  = require('http');
@@ -167,6 +171,8 @@ app = express();
 app.use(cors());
 
 app.use(express.json())
+
+app.use(fileUpload());
 
 
 // 
@@ -1584,6 +1590,25 @@ app.get('/delbubble', (req, res) => {
 		    console.log(fullDate.toUTCString()+" /delevent API:  Endpoint call from "+ip+".");
 		    console.log(recData);
 	    });
+    });
+});
+
+//upload img
+
+app.post('/upload', (req, res) => {
+    if(req.files == null) {
+        return res.status(400).json({ msg: 'No file! '});
+    }
+
+    const file = req.files.file;
+
+    file.mv(`../frontend/public/uploads/${file.name}`, err => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send(err);
+        }
+
+        res.json({ fileName: file.name, filePath: `uploads/${file.name}` });
     });
 });
 
