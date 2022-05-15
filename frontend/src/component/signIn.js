@@ -7,24 +7,20 @@ import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    Link,
-    useNavigate
-  } from "react-router-dom";
+  Link, useNavigate
+} from "react-router-dom";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import axios from 'axios';
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
+//Sign in page
 export default function SignIn() {
   let navigate = useNavigate();
   const [openFail, setOpenFail] = React.useState(false);
@@ -37,9 +33,9 @@ const handleCloseFail = () => {
     // console.log({
     //   email: data.get('email'),
     //   password: data.get('password'),
-    // }); 
+    // });
     try {
-      const res = await axios.post("http://localhost:8010/authenticate", 
+      const res = await axios.post("http://localhost:8010/authenticate",
       {  username: data.get('email'),
           password: data.get('password')
       }
@@ -48,7 +44,7 @@ const handleCloseFail = () => {
           if (res.data.authtoken) {
             localStorage.setItem("user", JSON.stringify(res.data));
             console.log("User Signed in successfully");
-            navigate('/home');
+            navigate('/uploadimg');
           }
         } else {
           console.log("Some error occured");
@@ -97,7 +93,7 @@ const handleCloseFail = () => {
               type="password"
               id="password"
             />
-            
+
             <Button
               type="submit"
               fullWidth

@@ -2,15 +2,12 @@ import * as React from 'react';
 import Button from '@mui/material/Button'
 import {Box} from '@mui/material'
 import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
     Link
   } from "react-router-dom";
 
 import Container from '@mui/material/Container';
-import Menubar from "./Menubar";
 
+//Front page of the application, displays a container with links to the signin and register pages
 export default function SignIn() {
 
 

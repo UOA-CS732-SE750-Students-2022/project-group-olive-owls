@@ -3,6 +3,7 @@ import { useDrop } from "react-dnd";
 import update from "immutability-helper";
 import { ItemTypes } from "../ItemTypes";
 import {Bubble} from "./Bubble";
+
 import styles from "../../pages/HomePage.module.css"
 
 
@@ -12,6 +13,7 @@ export const DroppableContainer = ({ hideSourceOnDrag, bubbles, setBubbles, rend
     useEffect(() => {
         setBoxes(bubbles);
     }, [bubbles]);
+
 
     const moveBox = useCallback(
         (id, left, top) => {
@@ -33,6 +35,7 @@ export const DroppableContainer = ({ hideSourceOnDrag, bubbles, setBubbles, rend
                 const left = Math.round(item.left + x);
                 const top = Math.round(item.top + y);
                 moveBox(item.id, left, top);
+
                 // setRender(!render);
                 return undefined;
             }
@@ -60,6 +63,7 @@ export const DroppableContainer = ({ hideSourceOnDrag, bubbles, setBubbles, rend
 
     return (
         <div ref={drop} className={styles.map} id="map" style={backgroundImageStyle}>
+
             {Object.keys(boxes).map((key) => {
                 const { left, top, title } = boxes[key];
                 return (

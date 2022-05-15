@@ -9,6 +9,7 @@ const style = {
     cursor: "move",
     width: "max-content",
     borderRadius: "50px"
+
 };
 const role = "Box";
 export const Bubble = ({ id, left, top, hideSourceOnDrag, children }) => {
@@ -31,3 +32,5 @@ export const Bubble = ({ id, left, top, hideSourceOnDrag, children }) => {
         </div>
     );
 };
+
+
