@@ -309,41 +309,6 @@ app.get('/mongoquery', (req, res) => {
 //  Events Endpoints
 //===============================================
 
-//app.all('/verifytoken', (req, res) => {
-//    expiretokens();
-//    console.log("Inside /verifytoken");
-//    console.log(req.body);
-//    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-//    ip = ip.replace('::ffff:', '');
-//
-//    if (!req.body.authtoken) {        // Require valid auth token to be supplied
-//        res.status(401).send({ msg: 'Invalid auth token supplied', validtoken: false });
-//        console.log("Authentication Error!!! No token supplied.");
-//        return;       
-//    }
-//
-//    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
-//    console.log("Built token query string: "+tokenquerystring)
-//
-//    var searchresult = searchtokens(tokenquerystring);
-//    //console.log(searchresult);
-//    if (!searchresult) {
-//        res.status(401).send({ msg: 'No Auth token or Expired Auth token', validtoken: false });
-//        console.log("Authentication Error!!! No valid token in master table.");
-//        return;        
-//    };
-//
-//    console.log("Found valid token in master table. token: "+req.body.authtoken+"   Expires: "+searchresult.tokenElement.expiredatetime);
-//    var responsertn = { };
-//    responsertn.msg = 'Token Valid';
-//    responsertn.expiredatetime = '';
-//    const expiredatetime = searchresult.tokenElement.expiredatetime;
-//    responsertn.expiredatetime = expiredatetime;
-//    responsertn.validtoken = true;
-//    res.status(200).send(responsertn);    
-//    console.log(fullDate.toUTCString()+" /verifytoken API:  Endpoint call from "+ip+". Result sent: "+responsertn);
-//    //console.log(searchresult);
-//});
 
 // /getevent endpoint.
 // 	Retrieve all events or event specified by eventID
@@ -1602,7 +1567,7 @@ app.post('/upload', (req, res) => {
 
     const file = req.files.file;
 
-    file.mv(`../frontend/public/uploads/${file.name}`, err => {
+    file.mv(`../backend/public/uploads/${file.name}`, err => {
         if (err) {
           console.error(err);
           return res.status(500).send(err);
