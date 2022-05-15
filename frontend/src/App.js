@@ -35,20 +35,20 @@ function App() {
                         </Route>
 
                         
-                        <Route path={"/bubble"} element={<BubbleEdit />}></Route>
-                        <Route path="/associate" element={<AssocEdit />}></Route>
+                        <Route path={"/bubble"} element={<PrivateRoute><BubbleEdit /></PrivateRoute>}></Route>
+                        <Route path="/associate" element={<PrivateRoute><AssocEdit /></PrivateRoute>}></Route>
                         <Route path="/register" element={<Register />}>
 
                         </Route>
-                        <Route path='/uploadimg' element={<Uploadimg />}>
+                        <Route path='/uploadimg' element={<PrivateRoute><Uploadimg /></PrivateRoute>}>
 
                         </Route>
                         <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/dnd" element={<DragAndDrop />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
-                        <Route path="/records" element={<Records />}/>
+                        <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute>}/>
 
-                        <Route path="/EmployeeRecords" element={<EmployeeRecords />}/>
+                        <Route path="/EmployeeRecords" element={<PrivateRoute><EmployeeRecords /></PrivateRoute>}/>
 
                     </Routes>
 
