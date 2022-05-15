@@ -5,7 +5,7 @@ import useGet from "../useGet";
 import {Container} from "@mui/material";
 import EmployeeMenuBar from "./EmployeeMenubar";
 import EmployeeTable from "./EmployeeTable";
-
+import BackBar from '../BackBar';
 function EmployeeRecords() {
     const[reRender, setreRender]=React.useState(false);
 
@@ -16,6 +16,7 @@ function EmployeeRecords() {
     return (
         <div>
             <Container sx={{mb:4}}>
+            <BackBar></BackBar>
                 <h1>Employees</h1>
                 <Container sx={{my:4}} maxWidth="xs">
                     <EmployeeMenuBar render={reRender} setRender={setreRender}/>

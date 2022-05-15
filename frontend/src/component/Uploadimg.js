@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import axios from 'axios';
-
+import BackBar from './BackBar';
 const Input = styled('input')({
     display: 'none',
 });
@@ -49,7 +49,10 @@ export default function Uploadimg() {
 
 
     return (
+        <div>
+        <BackBar></BackBar>
         <Container component="main" maxWidth="sm">
+        
             <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center', background:'#ADD8E6', padding:25, borderRadius:5}} >
                 { uploadedFile ? (<Box>
                     <img style={{ width:'100%'}} src={uploadedFile.filePath} alt=''/>
@@ -75,5 +78,6 @@ export default function Uploadimg() {
             </Box>
 
         </Container>
+        </div>
     );
 };

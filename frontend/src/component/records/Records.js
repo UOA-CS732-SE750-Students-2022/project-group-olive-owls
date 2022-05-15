@@ -4,7 +4,7 @@ import RecordsTable from './RecordsTable';
 import TableMenuBar from './TableMenubar';
 import { Container } from '@mui/material';
 import useGet from '../useGet';
-
+import BackBar from '../BackBar';
 function Records() {
   const[reRender, setreRender]=React.useState(false);
   const getData = useGet('http://localhost:8010/getevent',reRender);
@@ -13,6 +13,7 @@ function Records() {
   return (
     <div>
     <Container sx={{mb:4}}>
+    <BackBar></BackBar>
     <h1>Records</h1>
     <Container sx={{my:4}} maxWidth="xs">
     <TableMenuBar render={reRender} setRender={setreRender}/>     

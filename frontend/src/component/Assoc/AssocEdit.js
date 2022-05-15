@@ -4,7 +4,7 @@ import * as React from "react";
 import AssocMenuBar from "../Assoc/AssocMenubar";
 import AssocTable from "../Assoc/AssocTable";
 import useGet from "../useGet";
-
+import BackBar from '../BackBar';
 export default function AssocEdit(prop) {
 
     //gets id from the prop passed in by parameter passing
@@ -22,6 +22,7 @@ export default function AssocEdit(prop) {
 
     <div>
         <Container sx={{mb:4}}>
+        <BackBar></BackBar>
             <h1>Association Management</h1>
             <Container sx={{my:4}} maxWidth="xs">
                 <AssocMenuBar render={reRender} setRender={setreRender}/>

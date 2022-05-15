@@ -49,7 +49,7 @@ function App() {
                         <Route path="/alert" element={<Alert open={true} />}/>
 
                         <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute>}/>
-                        <Route path="/home" element={<HomePage />}/>
+                        <Route path="/home" element={<PrivateRoute><HomePage /></PrivateRoute>}/>
                         <Route path="/EmployeeRecords" element={<PrivateRoute><EmployeeRecords /></PrivateRoute>}/>
                     </Routes>
 

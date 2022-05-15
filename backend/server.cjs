@@ -800,7 +800,7 @@ app.all('/adduser', (req, res) => {
 			    recData['acknowledged'] = result2.acknowledged;
       		    recData['insertedId'] = result2.insertedId;
 			    //console.log(recData);
-       		    db.close();
+       		    //db.close();
                 res.status(200).send(recData);
                 const fullDate = new Date();
 			    console.log(fullDate.toUTCString()+" /adduser API: Endpoint call from "+ip); 
@@ -1636,7 +1636,7 @@ app.post('/upload', (req, res) => {
 
     const file = req.files.file;
 
-    file.mv(`../backend/public/uploads/${file.name}`, err => {
+    file.mv(`../frontend/public/uploads/${file.name}`, err => {
         if (err) {
           console.error(err);
           return res.status(500).send(err);

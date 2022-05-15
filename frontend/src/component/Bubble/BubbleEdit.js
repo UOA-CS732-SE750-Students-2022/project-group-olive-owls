@@ -6,7 +6,7 @@ import * as React from "react";
 import TableMenuBar from "../Bubble/BubbleMenubar";
 import RecordsTable from "../Bubble/BubbleTable";
 import useGet from "../useGet";
-
+import BackBar from '../BackBar';
 export default function BubbleEdit(prop) {
 
     //gets id from the prop passed in by parameter passing
@@ -24,6 +24,7 @@ export default function BubbleEdit(prop) {
 
     <div>
         <Container sx={{mb:4}}>
+        <BackBar></BackBar>
             <h1>Bubble Management</h1>
             <Container sx={{my:4}} maxWidth="xs">
                 <TableMenuBar render={reRender} setRender={setreRender}/>

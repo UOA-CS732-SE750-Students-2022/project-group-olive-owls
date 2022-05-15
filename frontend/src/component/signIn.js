@@ -44,7 +44,7 @@ const handleCloseFail = () => {
           if (res.data.authtoken) {
             localStorage.setItem("user", JSON.stringify(res.data));
             console.log("User Signed in successfully");
-            navigate('/uploadimg');
+            navigate('/home');
           }
         } else {
           console.log("Some error occured");
@@ -113,7 +113,7 @@ const handleCloseFail = () => {
 
         </Box>
       <Dialog open={openFail} onClose={handleCloseFail}>
-        <DialogTitle>Registration not successfull</DialogTitle>
+        <DialogTitle>Sign in not successfull</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Something went wrong, please try signing again
