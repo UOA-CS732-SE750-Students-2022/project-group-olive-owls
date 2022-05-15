@@ -1141,7 +1141,7 @@ app.all('/addstaff', (req, res) => {
 		    newvalues['surname'] = req.body.surname;  // *** TODO: Use CryptoJS to create hashvalue and store hashvalue instead. All auths will be on hashvalue.
 		    newvalues['startDate'] = currentDate;
             newvalues['endDate'] = '';
-            newvalues['DOB'] = '';
+            newvalues['DOB'] = req.body.DOB;
             newvalues['active'] = 'Y';                  // status
 		    console.log(newvalues);
 
