@@ -19,7 +19,7 @@ export default function TableMenubar(props) {
     const [openEdit, setOpenEdit] = React.useState(false);
     const [openAdd, setOpenAdd] = React.useState(false);
     const [openDel, setOpenDel] = React.useState(false);
-    const [staffIDVal, setStaffID] = React.useState(0);
+    const [staffIDVal, setStaffID] = React.useState("");
     const [staffNameVal, setStaffFirstName] = React.useState("");
     const [staffLastName, setStaffLastName] = React.useState("");
     const [staffActiveVal, setStaffActive] = React.useState("Y");
@@ -31,7 +31,7 @@ export default function TableMenubar(props) {
         //console.log(staffIDVal);
         try {
           const res = await axios.post("http://localhost:8010/deactivatestaff",
-          { staffID: parseInt(staffIDVal)},
+          { staffID: staffIDVal},
              {headers: {"Authorization" : "Bearer 1234567890"},
             }
             );
@@ -165,7 +165,7 @@ export default function TableMenubar(props) {
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => setStaffID(parseInt(e.target.value))}
+            onChange={(e) => setStaffID(e.target.value)}
           />
             <TextField
             autoFocus
@@ -314,7 +314,7 @@ export default function TableMenubar(props) {
             type="text"
             fullWidth
             variant="standard"
-            onChange={(e) => setStaffID(parseInt(e.target.value))}
+            onChange={(e) => setStaffID(e.target.value)}
           />
             
         </DialogContent>
