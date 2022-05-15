@@ -1132,7 +1132,7 @@ app.all('/addstaff', (req, res) => {
             if (typeof result1[0] === "undefined") {
                 nextid = 1;
             } else {
-		        nextid = result1[0].staffID + 1;
+		        nextid = parseInt(result1[0].staffID) + 1;
             }
             //console.log("userid: "+nextid);
 		    var newvalues = { };
