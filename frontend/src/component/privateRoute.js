@@ -1,7 +1,7 @@
 //Author - Syed Kazmi
 import React from 'react';
 import { Route, useNavigate } from 'react-router-dom';
-import useVerify from './../component/useVerify';
+//import useVerify from './../component/useVerify';
 import LoadingGif from '../Images/loading.gif';
 import { Container } from '@mui/material';
 import axios from 'axios';

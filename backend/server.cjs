@@ -701,28 +701,28 @@ app.all('/adduser', (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     ip = ip.replace('::ffff:', '');
 
-    if (!req.body.authtoken) {        // Require valid auth token to be supplied
-        res.status(401).send({ error: 'Invalid auth token' });
-        console.log("Authentication Error!!! No token supplied.");
-        return;       
-    }
-
-    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
-    console.log("Built token query string: "+tokenquerystring)
-
-    var searchresult = searchtokens(tokenquerystring);
-    console.log(searchresult);
-    if (!searchresult) {
-        res.status(401).send({ error: 'No Auth token or Expired Auth token. Add Failed' });
-        console.log("Authentication Error!!! No valid token in master table.");
-        return;        
-    };
+    // if (!req.body.authtoken) {        // Require valid auth token to be supplied
+    //     res.status(401).send({ error: 'Invalid auth token' });
+    //     console.log("Authentication Error!!! No token supplied.");
+    //     return;
+    // }
+    //
+    // tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
+    // console.log("Built token query string: "+tokenquerystring)
+    //
+    // var searchresult = searchtokens(tokenquerystring);
+    // console.log(searchresult);
+    // if (!searchresult) {
+    //     res.status(401).send({ error: 'No Auth token or Expired Auth token. Add Failed' });
+    //     console.log("Authentication Error!!! No valid token in master table.");
+    //     return;
+    // };
 
     // Future: Validate incoming data
 
 
-    console.log("Found valid token in master table. Good to go.");
-    console.log(searchresult);
+    // console.log("Found valid token in master table. Good to go.");
+    // console.log(searchresult);
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
