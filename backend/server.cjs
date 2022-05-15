@@ -70,6 +70,7 @@
 //                       - Also consider encrypting both staff and user information records before writes to protect data at rest.
 //         Bubble endpoints. Handle disableBEARER switch in these endpoints. 
 //         Change to getbubble endpoint. If no parameter is supplied. return all enteries. 
+//         Change to all User endpoints making sure staffID is always a string and flipping between string and Integer.
 //
 
 function generateRandom (len) {
@@ -1183,11 +1184,12 @@ app.all('/addstaff', (req, res) => {
         dbo.collection("Staff").find({}).sort({"staffID" : -1}).limit(1).toArray(function(err, result1) {
             if (err) throw err;
             //console.log(result1[0]);
-            var nextid = 0;
+            var nextid = "0";
             if (typeof result1[0] === "undefined") {
-                nextid = 1;
+                nextid = "1";
             } else {
-		        nextid = result1[0].staffID + 1;
+		        nextid1 = parseInt(result1[0].staffID) + 1;
+                nextid = nextid1.toString();
             }
             //console.log("userid: "+nextid);
 		    var newvalues = { };
@@ -1198,7 +1200,7 @@ app.all('/addstaff', (req, res) => {
             newvalues['endDate'] = '';
             newvalues['DOB'] = req.body.DOB;
             newvalues['active'] = 'Y';                  // status
-		    console.log(newvalues);
+		    //console.log(newvalues);
 
         	dbo.collection("Staff").insertOne(newvalues, function(err, result2) {
             	if (err) {
@@ -1314,7 +1316,7 @@ app.all('/updstaff', (req, res) => {
                 return;
         } else  {
                 var query = { };
-                query["staffID"] = parseInt(staffID);
+                query["staffID"] = staffID;
         }
 
         console.log("Here");
@@ -1373,10 +1375,11 @@ app.all('/deactivatestaff', (req, res) => {
                 return;
         } else  {
                 var query = { };
-                query["staffID"] = parseInt(staffID);
+                query["staffID"] = staffID;
         }
 
         req.body.active = "N";
+        console.log("Request Body");
 	    console.log(req.body);
 
 	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
