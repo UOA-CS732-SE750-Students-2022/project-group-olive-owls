@@ -1,4 +1,3 @@
-
 //   Date: 6/4/2022                                                         S. Schmidt (ssch162)
 //   Desc: This is the backend server for Olive Owls project.
 //      It will handle all backend processing requests for the COVID app
@@ -63,6 +62,15 @@
 //
 //   Date: 14/5/2022                            Guanxiang Zhao
 //   Desc: Added upload image endpoint
+//
+//   Date: 15/5/2022                            S. schmidt
+//   Desc: Add u/p authentication in authentication endpoint.
+//          FUTURE WORK: Encrypt cleartext user passwords with a Hash representation before storing and use that for validation.
+//                       - Discussion/decision required around weather this extends to the frontend and all passwords are hashed before transmission or just for storing)
+//                       - Also consider encrypting both staff and user information records before writes to protect data at rest.
+//         Bubble endpoints. Handle disableBEARER switch in these endpoints. 
+//         Change to getbubble endpoint. If no parameter is supplied. return all enteries. 
+//
 
 function generateRandom (len) {
     var crypto = require("crypto");
@@ -124,6 +132,11 @@ function searchtokens (searchstring) {
     }
 }  
 
+
+// Check if an object is empty
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
 
 const fileUpload = require('express-fileupload');
 const express = require('express');
@@ -605,8 +618,12 @@ if (admin) {
 // 	This endpoint must be accessed first to receive a token before doing any user processing
 // Parameters: { "username": "<YourUserName>", "password": "<YourPassWord>" }
 
+// /authenticate endpoint.
+// 	This endpoint must be accessed first to receive a token before doing any user processing
+// Parameters: { "username": "<YourUserName>", "password": "<YourPassWord>" }
+
 app.all('/authenticate', (req, res) => {
-    console.log("Inside /requestauthtoken");
+    console.log("Inside /authenticate");
     expiretokens();
     console.log(req.body);
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -625,33 +642,70 @@ app.all('/authenticate', (req, res) => {
         return;       
     };
 
-    // Validate username/password
-    // Future Change: TODO: This will be completed once auth mode has been decided
+    // Validate username/password. If all good then create and fire back a token
+    // Future Work: Use Hash representation of password for validation.
+    var username = req.body.username;
+    var password = req.body.password;
 
-    //  Ok, we got to here. All checks passed. Generate and send back auth token.
-    const authToken = req.body.username+":"+generateRandom(10);
-    var tokenElement = {};
-    tokenElement.tokenkey = authToken+":"+ip;
-    tokenElement.expires = Math.floor(Date.now() / 1000) + 1800;  // Expires in 30 mmintues
-    //tokenElement.expires = Math.floor(Date.now() / 1000) + 120;  // Expires in 2 mmintues. Uncomment for testing
-    tokenElement.expired = false;     
-    const expirymilliseconds = tokenElement.expires * 1000;
-    const dateObject = new Date(expirymilliseconds);
-    const expiryDateFormat = dateObject.toLocaleString();
-    tokenElement.expiredatetime = expiryDateFormat;
-    masterTokenTable.push({ tokenElement: tokenElement });
+    // MongoDB query
+    var MongoClient = require('mongodb').MongoClient;
+    var url = MongoDBConnString;
+    //var url = "mongodb+srv://root:9Zv5SvE4tK9jKbF@cluster0.ule3y.mongodb.net/test?authSource=admin&replicaSet=atlas-yflv4e-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true";
+    var recData = '';
+    MongoClient.connect(url, function(err, db) {
+        if (err) throw err;
+        var dbo = db.db("OliveOwls");
+        var query = { };
+       	//var query = { username : "" };
+		query['username'] = username;
+        query['password'] = password;
+	    console.log("Query String: "+query);
+        console.log("Authenticate Query:");
+        console.log(query);
+        dbo.collection("Users").find(query).toArray(function(err, result) {
+            if (err || isEmpty(result)) {
+                console.log("Error Processing.");
+                console.log("Result Set:");
+                console.log(result);
+                recData = {  };
+                recData.error = 401
+                recData.msg = "No user/password matching";
+                //db.close();
+	            res.setHeader('Access-Control-Allow-Methods', '*');
+                res.status(401).send(recData);
+                const fullDate = new Date();
+	            console.log(fullDate.toUTCString()+" /authenticate API: U/P check - Response 401 sent back. Endpoint call from "+ip);
+            } else {
+                //  Ok, we got to here. All checks passed. Generate and send back auth token.
+                console.log("Valididated.");
+                console.log("Result Set:");
+                console.log(result);
+                const authToken = req.body.username+":"+generateRandom(10);
+                var tokenElement = {};
+                tokenElement.tokenkey = authToken+":"+ip;
+                tokenElement.expires = Math.floor(Date.now() / 1000) + 1800;  // Expires in 30 mmintues
+                //tokenElement.expires = Math.floor(Date.now() / 1000) + 120;  // Expires in 2 mmintues. Uncomment for testing
+                tokenElement.expired = false;     
+                const expirymilliseconds = tokenElement.expires * 1000;
+                const dateObject = new Date(expirymilliseconds);
+                const expiryDateFormat = dateObject.toLocaleString();
+                tokenElement.expiredatetime = expiryDateFormat;
+                masterTokenTable.push({ tokenElement: tokenElement });
 
-    // Fire back new token and expiry
-    recData = {  };
-    recData.authtoken = authToken;
-    recData.expirytimestamp = tokenElement.expires;
-    recData.expirydatetime = expiryDateFormat;
-    recData.status  = "Authenticated OK";
-    res.status(200).send(recData);
+                // Fire back new token and expiry
+                recData = {  };
+                recData.authtoken = authToken;
+                recData.expirytimestamp = tokenElement.expires;
+                recData.expirydatetime = expiryDateFormat;
+                recData.status  = "Authenticated OK";
+                res.status(200).send(recData);
 
-    const fullDate = new Date();
-    console.log(fullDate.toUTCString()+" /updevent API:  Endpoint call from "+ip+". New authToken sent: "+authToken);
-    console.log(masterTokenTable);
+                const fullDate = new Date();
+                console.log(fullDate.toUTCString()+" /authenticate API:  Endpoint call from "+ip+". New authToken sent: "+authToken);
+                console.log(masterTokenTable);
+            }
+        });
+    });
 });
 
 //===============================================
@@ -784,7 +838,9 @@ app.all('/adduser', (req, res) => {
        		    db.close();
                 res.status(200).send(recData);
                 const fullDate = new Date();
-			    console.log(fullDate.toUTCString()+" /adduser API: Endpoint call from "+ip);    
+			    console.log(fullDate.toUTCString()+" /adduser API: Endpoint call from "+ip); 
+                // Catchall. Make sure an index exists for userid. Ensures a unique ID and quick lookups. 
+                dbo.collection("Users").createIndex( { "username": 1 }, { unique: true } );
        	    });
 	    });
     });
@@ -1397,14 +1453,21 @@ app.get('/getbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // get bubble id
-    var bubbleid = req.query.bubbleID;
+    //var bubbleid = req.query.bubbleID;
+    if (req.body.bubbleID) {
+        var bubbleid = req.query.bubbleID;
+    } else {
+        var bubbleid = '';
+    }
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -1415,12 +1478,13 @@ app.get('/getbubble', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-        if (typeof bubbleid === "undefined") {
+        if (bubbleid === '') {
             var query = {};
         } else	{
             var query = { bubbleID : 0 };
             query['bubbleID'] = parseInt(bubbleid);
         }
+        console.log(query);
 
         dbo.collection("Bubbles").find(query).toArray(function(err, result) {
             if (err) throw err;
@@ -1444,11 +1508,13 @@ app.all('/addbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // MongoDB query
     var MongoClient = require('mongodb').MongoClient;
@@ -1496,11 +1562,13 @@ app.all('/updbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
     
     // Get the bubble id which want to update
     var bubbleid = req.query.bubbleID;
@@ -1550,11 +1618,13 @@ app.get('/delbubble', (req, res) => {
 
     //Authorization
     const authHeader = req.headers.authorization;
-    if (authHeader != authKey) {
-        res.status(401).send('Authentication Error.');
-        console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
-        return;
-    }
+    if (!disableBearer) {
+        if (authHeader != authKey) {
+            res.status(401).send({ error: 'Authentication Error.'} );
+            console.log("Authentication Error!!! Wrong or No Bearer supplied.   Received: "+authHeader);
+            return;
+        }
+    };
 
     // Get bubbleid which want to delet
     var bubbleid = req.query.bubbleID;

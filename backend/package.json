@@ -18,9 +18,14 @@
     "esm": "^3.2.25",
     "express": "^4.18.1",
     "express-fileupload": "^1.3.1",
+<<<<<<< HEAD
     "mongodb": "^4.6.0",
     "mongoose": "^6.2.8",
     "process": "^0.11.10",
     "react-router-dom": "^6.3.0"
+=======
+    "mongodb": "^4.5.0",
+    "mongoose": "^6.2.8"
+>>>>>>> 3cc8cf4b355c4708d5108fe71df166d5d5b1c46b
   }
 }
