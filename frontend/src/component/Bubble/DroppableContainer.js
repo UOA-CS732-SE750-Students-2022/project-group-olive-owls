@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDrop } from "react-dnd";
 import update from "immutability-helper";
-import { ItemTypes } from "./ItemTypes";
+import { ItemTypes } from "../ItemTypes";
 import {Bubble} from "./Bubble";
 
 const styles = {

@@ -322,41 +322,6 @@ app.get('/mongoquery', (req, res) => {
 //  Events Endpoints
 //===============================================
 
-//app.all('/verifytoken', (req, res) => {
-//    expiretokens();
-//    console.log("Inside /verifytoken");
-//    console.log(req.body);
-//    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-//    ip = ip.replace('::ffff:', '');
-//
-//    if (!req.body.authtoken) {        // Require valid auth token to be supplied
-//        res.status(401).send({ msg: 'Invalid auth token supplied', validtoken: false });
-//        console.log("Authentication Error!!! No token supplied.");
-//        return;       
-//    }
-//
-//    tokenquerystring = req.body.authtoken+":"+ip;     // Build lookup string
-//    console.log("Built token query string: "+tokenquerystring)
-//
-//    var searchresult = searchtokens(tokenquerystring);
-//    //console.log(searchresult);
-//    if (!searchresult) {
-//        res.status(401).send({ msg: 'No Auth token or Expired Auth token', validtoken: false });
-//        console.log("Authentication Error!!! No valid token in master table.");
-//        return;        
-//    };
-//
-//    console.log("Found valid token in master table. token: "+req.body.authtoken+"   Expires: "+searchresult.tokenElement.expiredatetime);
-//    var responsertn = { };
-//    responsertn.msg = 'Token Valid';
-//    responsertn.expiredatetime = '';
-//    const expiredatetime = searchresult.tokenElement.expiredatetime;
-//    responsertn.expiredatetime = expiredatetime;
-//    responsertn.validtoken = true;
-//    res.status(200).send(responsertn);    
-//    console.log(fullDate.toUTCString()+" /verifytoken API:  Endpoint call from "+ip+". Result sent: "+responsertn);
-//    //console.log(searchresult);
-//});
 
 // /getevent endpoint.
 // 	Retrieve all events or event specified by eventID
@@ -1156,7 +1121,7 @@ app.all('/delassoc', (req, res) => {
 
         // Will load each parameter received. If none, then the query string will be empty returning all.
         var query = { };
-        query['associd'] = staffid+":"+bubbleid;
+        query['associd'] = bubbleid+":"+staffid;
 	    console.log("Query String: "+query);
         console.log(query);
 
@@ -1214,7 +1179,6 @@ app.all('/addstaff', (req, res) => {
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db("OliveOwls");
-    	currentDate = new Date().toLocaleString("en-NZ", {timeZone: "Pacific/Auckland",timeZoneName: "short"}).replace(',','');
 
         dbo.collection("Staff").find({}).sort({"staffID" : -1}).limit(1).toArray(function(err, result1) {
             if (err) throw err;
@@ -1230,9 +1194,9 @@ app.all('/addstaff', (req, res) => {
             newvalues['staffID'] = nextid;
 		    newvalues['firstName'] = req.body.firstName;
 		    newvalues['surname'] = req.body.surname;  // *** TODO: Use CryptoJS to create hashvalue and store hashvalue instead. All auths will be on hashvalue.
-		    newvalues['startDate'] = currentDate;
+		    newvalues['startDate'] = req.body.startDate;
             newvalues['endDate'] = '';
-            newvalues['DOB'] = '';
+            newvalues['DOB'] = req.body.DOB;
             newvalues['active'] = 'Y';                  // status
 		    console.log(newvalues);
 
@@ -1353,6 +1317,7 @@ app.all('/updstaff', (req, res) => {
                 query["staffID"] = parseInt(staffID);
         }
 
+        console.log("Here");
 	    console.log(req.body);
 
 	    // example of parameter injection:    const updateDoc = { $set: { plot: `A harvest of random numbers, such as: ${Math.random()}` }, };
@@ -1496,7 +1461,6 @@ app.get('/getbubble', (req, res) => {
         });
     });
 });
-
 
 
 // Addbubble endpoingt
@@ -1672,7 +1636,7 @@ app.post('/upload', (req, res) => {
 
     const file = req.files.file;
 
-    file.mv(`../frontend/public/uploads/${file.name}`, err => {
+    file.mv(`../backend/public/uploads/${file.name}`, err => {
         if (err) {
           console.error(err);
           return res.status(500).send(err);

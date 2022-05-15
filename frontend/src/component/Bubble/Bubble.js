@@ -1,5 +1,6 @@
 import { useDrag } from "react-dnd";
-import { ItemTypes } from "./ItemTypes";
+import { ItemTypes } from "../ItemTypes";
+import {Link} from "@mui/material";
 
 const style = {
     position: "absolute",
@@ -27,6 +28,10 @@ export const Bubble = ({ id, left, top, hideSourceOnDrag, children }) => {
     return (
         <div ref={drag} style={{ ...style, left, top }} role={role}>
             {children}
+            //adds the link to the bubble edit page with the information in the bubble
+            <Link to={`/BubbleEdit/${this.Bubble}`}>.</Link>
         </div>
+
     );
 };
+

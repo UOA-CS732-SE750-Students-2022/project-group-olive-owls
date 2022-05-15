@@ -4,29 +4,21 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useNavigate 
+  useNavigate
 } from "react-router-dom";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-//import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import axios from 'axios';
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-
-
+//Register page so employees can be gain permission to use the webapp
 export default function Register() {
   let navigate = useNavigate();
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -48,7 +40,7 @@ const handleCloseFail = () => {
     //   password: data.get('password'),
     // });
     try {
-      const res = await axios.post("http://localhost:8010/adduser", 
+      const res = await axios.post("http://localhost:8010/adduser",
       {  username: data.get('email'),
           password: data.get('password')
       }
