@@ -29,16 +29,13 @@ function App() {
                     <Routes>
                         <Route path="/login" element={<SignIn />}/>
                         <Route path="/" element={<Root />}/>
-                        <Route path="/register" element={<Register />}>
+                        <Route path="/register" element={<Register />}/>
 
-                        </Route>
-                        <Route path='/uploadimg' element={<Uploadimg />}>
-                        
-                        </Route>
                         <Route path="/sidebar" element={<SideBar />}/>
                         <Route path="/alert" element={<Alert open={true} />}/>
                         <Route path="/records" element={<PrivateRoute><Records /></PrivateRoute> }/>
-                        <Route path="/home" element={<HomePage/>}/>
+                        <Route path="/home" element={<HomePage />}/>
+                        <Route path='uploadimg' element={<Uploadimg />}/>
                     </Routes>
 
                 </Router>

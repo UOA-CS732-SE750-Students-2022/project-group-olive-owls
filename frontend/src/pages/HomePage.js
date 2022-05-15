@@ -2,14 +2,18 @@ import Menubar from "../component/Menubar";
 import styles from "./HomePage.module.css"
 import SideBar from "../component/Sidebar";
 import {DroppableContainer} from "../component/DroppableContainer";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import * as React from "react";
 import useGet from "../component/useGet";
 import axios from "axios";
 
 export default function HomePage() {
 
-    const [bubbles, setBubbles] = useState(false);
+    let array = [];
+    let [bubbles, setBubbles] = useState(false);
+    const [bubbleData, setBubbleData] = useState(false);
+    const [render, setRender] = useState(false);
+
 
     const getBubbles = async (e) => {
         // e.preventDefault();
@@ -20,8 +24,7 @@ export default function HomePage() {
 
             if (res.status === 200) {
                 console.log("Got List of bubbles successfully");
-                setBubbles(res.data);
-                console.log(bubbles);
+                setBubbleData(res.data);
 
             } else {
                 console.log("Some error occurred");
@@ -31,7 +34,28 @@ export default function HomePage() {
         }
     };
 
-    // getBubbles()
+    useEffect(() => {
+        getBubbles();
+    }, []);
+
+    if (bubbleData === false || bubbleData.length == 0) {
+        console.log("BubbleData is empty");
+    } else {
+        console.log("BubbleData not empty");
+        console.log(bubbleData);
+        bubbleData.map((item,index) => {
+            array[index] = {};
+            array[index].title = item.bubbleName;
+            array[index].top = 20;
+            array[index].left = 20 + (index * 50);
+
+        });
+
+        bubbles = array
+        console.log(bubbles)
+    }
+
+
 
     return (
         <div>
@@ -40,9 +64,9 @@ export default function HomePage() {
             </header>
             <div className={styles.container}>
                 <div className={styles.sideItem}>
-                    <SideBar getBubbles = { getBubbles } bubbles = { bubbles }/>
+                    <SideBar bubbles = { bubbles }/>
                 </div>
-                <DroppableContainer boxes={ bubbles } setBoxes={ setBubbles }/>
+                <DroppableContainer bubbles={ bubbles } setBubbles={ setBubbles } render={ render } setRender={ setRender }/>
 
             </div>
 

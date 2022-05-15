@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 import { useDrop } from "react-dnd";
 import update from "immutability-helper";
 import { ItemTypes } from "./ItemTypes";
@@ -6,11 +6,13 @@ import {Bubble} from "./Bubble";
 import styles from "../pages/HomePage.module.css"
 
 
-export const DroppableContainer = ({ hideSourceOnDrag, boxes, setBoxes } ) => {
-    // const [boxes, setBoxes] = useState({
-    //     a: { top: 20, left: 80, title: "Bubble 1" },
-    //     b: { top: 180, left: 20, title: "Bubble 2" }
-    // });
+export const DroppableContainer = ({ hideSourceOnDrag, bubbles, setBubbles, render, setRender } ) => {
+    const [boxes, setBoxes] = useState(false);
+
+    useEffect(() => {
+        setBoxes(bubbles);
+    }, [bubbles]);
+
     const moveBox = useCallback(
         (id, left, top) => {
             setBoxes(
@@ -31,8 +33,10 @@ export const DroppableContainer = ({ hideSourceOnDrag, boxes, setBoxes } ) => {
                 const left = Math.round(item.left + x);
                 const top = Math.round(item.top + y);
                 moveBox(item.id, left, top);
+                // setRender(!render);
                 return undefined;
             }
+
         }),
         [moveBox]
     );
@@ -52,6 +56,7 @@ export const DroppableContainer = ({ hideSourceOnDrag, boxes, setBoxes } ) => {
     };
 
     // console.log(image)
+
 
     return (
         <div ref={drop} className={styles.map} id="map" style={backgroundImageStyle}>

@@ -6,8 +6,9 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import EventIcon from '@mui/icons-material/Event';
 import React from 'react';
 import MenuItemList from "./MenuItemList";
+import AddIcon from '@mui/icons-material/Add';
 
-export default function SideBar({ getBubbles, bubbles }) {
+export default function SideBar({ bubbles }) {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -57,6 +58,14 @@ export default function SideBar({ getBubbles, bubbles }) {
                                     <EventIcon />
                                 </ListItemIcon>
                                 <ListItemText primary="Upcoming Events" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem disablePadding>
+                            <ListItemButton>
+                                <ListItemIcon>
+                                    <AddIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Upload Image" />
                             </ListItemButton>
                         </ListItem>
                     </List>
