@@ -30,10 +30,9 @@ export default function TableMenubar(props) {
         e.preventDefault();
         //console.log(staffIDVal);
         try {
-          const res = await axios.get("http://localhost:8010/deactivatestaff",
-
-          { params: { staffID: staffIDVal },
-             headers: {"Authorization" : "Bearer 1234567890"},
+          const res = await axios.post("http://localhost:8010/deactivatestaff",
+          { staffID: staffIDVal },
+             {headers: {"Authorization" : "Bearer 1234567890"},
             }
             );
 
