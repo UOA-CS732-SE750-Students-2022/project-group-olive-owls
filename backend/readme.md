@@ -22,8 +22,8 @@ You need to change the execution policy. <br/>
 Run **powershell as administrator.** and execute the following command. <br/>
 **Set-ExecutionPolicy -ExecutionPolicy RemoteSigned** <br/>
 
-Install router-dom <br/>
-**yarn add react-router-dom** <br/>
+Install Dependant Packages <br/>
+**npm install** <br/>
 
 - Required modules that need to be installed <br/>
 **"yarn add esm"** <br/>
