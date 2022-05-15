@@ -17,11 +17,8 @@ import TextField from '@mui/material/TextField';
 export default function AssocMenubar(props) {
     const [openAdd, setOpenAdd] = React.useState(false);
     const [openDel, setOpenDel] = React.useState(false);
-    const [eventIDVal, seteventIDVal] = React.useState("");
     const [bubbleidVal, setbubbleidVal] = React.useState("");
     const [staffidVal, setstaffidVal] = React.useState("");
-    const [eventLocVal, seteventLocVal] = React.useState("");
-    const [eventDateVal, seteventDateVal] = React.useState("");
 
     const handleSubmitDel = async (e) => {
         e.preventDefault();
@@ -43,7 +40,6 @@ export default function AssocMenubar(props) {
         } catch (err) {
           console.log(err);
         }
-        seteventIDVal("");
         handleCloseDel();
         props.setRender(!props.render);
       };
@@ -69,8 +65,6 @@ export default function AssocMenubar(props) {
         }
         setbubbleidVal("");
         setstaffidVal("");
-        seteventLocVal("");
-        seteventDateVal("");
         handleCloseAdd();
         props.setRender(!props.render);
       };
