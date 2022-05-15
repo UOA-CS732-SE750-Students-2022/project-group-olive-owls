@@ -2,8 +2,8 @@
 
 ## Quick-Start
 To learn how to clone, install and run our frontend or backend, check out these links:
-- [Frontend](frontend/README.md)
-- [Backend](backend/README.md)
+- [Frontend](frontend/readme.md)
+- [Backend](backend/readme.md)
 
 ## Explanation
 
