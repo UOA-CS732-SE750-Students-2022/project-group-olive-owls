@@ -142,7 +142,7 @@ export default function AssocMenubar(props) {
             id="bubbleid"
             value={bubbleidVal}
             label="Bubble ID Number"
-            type="text"
+            type="number"
             fullWidth
             variant="standard"
             onChange={(e) => setbubbleidVal(e.target.value)}
