@@ -25,10 +25,11 @@ Run **powershell as administrator.** and execute the following command. <br/>
 Install Dependant Packages <br/>
 **npm install** <br/>
 
-- Required modules that need to be installed <br/>
+- Required modules that may need to be installed <br/>
 **"yarn add esm"** <br/>
 **"yarn add axios"** <br/>
 **"npm install cors"** <br/>
+**"npm install express-fileupload"** <br/>
 
 MongoDB library <br/>
 **"yarn add mongodb"** <br/>
@@ -107,3 +108,39 @@ Added endpoints for CRUD operations on the Events table.<br/>
     - User Token Authentication processing<br/>
     - CRUD funtions against user authentication table entries<br/>
     - STILL TODO: Authenticaton logging<br/>
+
+10/5/2022      S. Schmidt<br/>
+- Removed token validation in endpoint /adduser. <br/>
+- Added new endpoint to Users. /verifytoken<br/>
+  - Confirms supplied token is valid<br/>
+Added cors (cross-origin resource sharing) library.<br/>
+
+10/5/2022      Guanxiang Zhao (gzha644)<br/>
+Added endpoints for Bubbles.<br/>
+
+11/5/2022                            S. Schmidt<br/>
+- Added new endpoints for Association table<br/>
+    /addassoc     /getassoc    /delassoc<br/>
+
+11/5/2022      S. Schmidt<br/>
+- Added new CRUD endpoints for Staff table<br/>
+         /addstaff     /getstaff    /updstaff     /desctivatestaff<br/>
+- Change MongoDB connection string to be a central varible that functions reference rather than a <br/>
+    string in the local functions.<br/>
+- Added createindex on ID's for Staff, Associations & Events.<br/>
+    Ensures ID's are unique and lookups are faster. <br/>
+    When insertOne functions are processed by MongoDB, if the table doesn't exist, it will be created <br/>
+    and then a unique index added on the ID for the table.<br/>
+
+14/5/2022       S. Schmidt<br/>
+- Change MongoDB connection string to be a central varible that Bubble endpoints reference rather than a <br/>
+    string in the local functions. Additions to change made by gzha644.<br/>
+
+14/5/2022                            Guanxiang Zhao<br/>
+- Added upload image endpoint<br/>
+
+15/5/2022       S. Schmidt<br/>
+- Add u/p authentication in authentication endpoint.<br/>
+- FUTURE WORK: Encrypt cleartext user passwords with a Hash representation before storing and use that for validation.<br/>
+    - Discussion/decision required around weather this extends to the frontend and all passwords are hashed before transmission or just for storing)<br/>
+    - Also consider encrypting both staff and user information records before writes to protect data at rest.<br/>
