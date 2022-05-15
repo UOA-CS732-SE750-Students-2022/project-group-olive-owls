@@ -14,6 +14,7 @@ export default function SignIn() {
     return (
         <div>
             <Container component="main" maxWidth="xs">
+            <h1>INSERT COMPANY NAME: COVID TRACKER</h1>
                 <Box sx={{
                     marginTop: 70,
                     display: 'flex',
