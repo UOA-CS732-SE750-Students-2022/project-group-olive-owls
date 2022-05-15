@@ -6,41 +6,41 @@ These are base setup notes. Not all commands may be required. (Depends on your g
 #
 Install Node.js <br/>
 **https://nodejs.org/en/download/** </br>
-<br/>
+
+Install Express
 **npm install --save express** <br/>
- <br/>
+
 Install yarn <br/>
-**npm install yarn** <br/>
- <br/>
+**npm install -g yarn** <br/>
+
 Note: If you receive the following error  <br/>
-<br/>
 "yarn : File C:\Users\sschm\AppData\Roaming\npm\yarn.ps1 cannot be loaded because running <br/>
 scripts is disabled on this system. For more information, see about_Execution_Policies at <br/>
 https:/go.microsoft.com/fwlink/?LinkID=135170." <br/>
-<br/>
+
 You need to change the execution policy. <br/>
 Run **powershell as administrator.** and execute the following command. <br/>
 **Set-ExecutionPolicy -ExecutionPolicy RemoteSigned** <br/>
- <br/>
-Install router-dom <br/>
-**yarn add react-router-dom** <br/>
-<br/>
+
+Install Dependant Packages <br/>
+**npm install** <br/>
+
 - Required modules that need to be installed <br/>
 **"yarn add esm"** <br/>
 **"yarn add axios"** <br/>
 **"npm install cors"** <br/>
-<br/>
-- MongoDB library <br/>
+
+MongoDB library <br/>
 **"yarn add mongodb"** <br/>
 or ... <br/>
 **"npm install mongodb"** <br/>
-<br/>
-- Nodaemon. Good for server testing. (Daemon does not fork to background and automatically restarts on save)<br/>
+
+Nodaemon. Good for server testing. (Daemon does not fork to background and automatically restarts on save)<br/>
 **"yarn global add nodemon"** <br/>
 or <br/>
 **"npm install -g nodemon"** <br/>
-<br/>
-- Starting server up <br/>
+
+Starting server up <br/>
 **"node server.cjs"** <br/>
 
 #  Processing Control Switches
@@ -71,7 +71,7 @@ or <br/>
 
 9/4/2022 10:26am<br/>
 Initial setup of backend directory on github:project-group-olive-owl<br/>
-<br/>
+
 - Copied server.js over from my dev directories<br/>
 	- Initial dev based off lab examples<br/>
 - updated .gitignore<br/>
@@ -83,19 +83,19 @@ Initial setup of backend directory on github:project-group-olive-owl<br/>
 - Initial code cleanup<br/>
 - Ran devstart test environment before commit<br/>
 - Created BackendUpdates branch<br/>
-<br/>
+
 26/4/2022	  S.Schmidt<br/>
-<br/>
+
 - Made changes to server.js to include handling encrypted connections as well as some basic authentication. <br/>
 - Moved from server.js to server.cjs extention (common JS) to handle the "require" function correctly for https libraries.<br/>
 - Started planning the layout of the program. <br/>
 - Created a couple of test endpoints to get the overall base functionlity running.<br/>
-<br/>
+
 29/04/2022	  S.Schmidt<br/>
 Added endpoints for CRUD operations on the Events table.<br/>
-<br/>
+
 3/5/2022	  S.Schmidt<br/>
-<br/>
+
 - Added 3 control switchs<br/>
   - "disableHTTPS" which allows HTTPS to be switched on or off in code.<br/>
     (Primarily for use when runningoff localhost or just dont want encryption.)<br/>
