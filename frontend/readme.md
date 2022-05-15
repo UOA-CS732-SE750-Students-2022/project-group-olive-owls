@@ -1,5 +1,5 @@
 
-# Backend: Install Notes
+# Frontend: Install Notes
 
 These are base setup notes. Not all commands may be required. (Depends on your global installs) <br/>
 
